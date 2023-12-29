@@ -73,6 +73,9 @@ step 3
 python manage.py runserver
 
 
+note
+
+provided a test frontend react-native integrated with expo.dev for testing purposes
 
 
 
