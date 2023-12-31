@@ -1,81 +1,74 @@
-working functions for the current backend code
+# Mybackend Project README
 
-User account
+## User Account Functions
 
-•	Login
-•	Register
-•	View details
-•	Change email
-•	Change password
-•	Change phone
-•	Change profession
-•	Confirm email registered through OTP
+- **Login**: User can log in to their account.
+- **Register**: New users can create an account.
+- **View Details**: Users can view their account details.
+- **Change Email**: Allows users to update their email address.
+- **Change Password**: Users can change their account password.
+- **Change Phone**: Update the phone number associated with the account.
+- **Change Profession**: Users can update their profession details.
+- **Confirm Email**: Verify the email address registered through OTP (One-Time Password).
+- **Login using other platforms**: Facilitates logging in via different platforms.
 
-To-do-list
+## To-do List Features
 
-•	Create a task
-•	Mark finished tasks
-•	Delete a task
-•	Update a field (priority, etc.)
-•	View all tasks
-•	View a specific task
+- **Create a Task**: Users can add new tasks.
+- **Mark Finished Tasks**: Mark tasks as completed.
+- **Delete a Task**: Remove tasks from the list.
+- **Update a Field**: Modify task details (e.g., priority).
+- **View All Tasks**: Display all tasks.
+- **View a Specific Task**: Look at details of a particular task.
 
-Calendar
+## Calendar Functionality
 
-•	Create event
-•	Delete an event
-•	Update a field (title, etc.)
-•	View event
+- **Create Event**: Add new events.
+- **Delete an Event**: Remove events.
+- **Update a Field**: Change event details (e.g., title).
+- **View Event**: See event details.
 
-remaining functions to do
+## Remaining Functions To Implement
 
-account
+### Account
 
-•	OTP when signed in
-•	Login using other platforms
+- **OTP When Signed In**: Implement OTP verification during sign-in.
 
-calendar
+### Calendar
 
-•	Assistant 
+- **Assistant**: Add assistant functionality.
 
-Emails
+### Emails
 
-•	Read the inbox( IMAP)
-•	Send an email (IMAP)
-•	set priority emails from the email list provided by the user
+- **Read the Inbox (IMAP)**: Implement inbox reading via IMAP.
+- **Send an Email (IMAP)**: Enable sending emails through IMAP.
+- **Set Priority Emails**: Allow setting priority for emails based on a provided list.
 
-database
+### Database
 
-•	integrating view to enhance the security is missing
+- **Integrate Viewing Security**: Enhance security through an integrated view.
 
-to run the backend 
+## Steps to Run the Backend
 
-step1.
+### Step 1: Create a New Environment
 
-make a new environment (environment outside the Mybackend folder)
+- Make a new environment (outside the Mybackend folder):  
+  `python -m venv myenv`
+- Activate the environment:  
+  - Linux: `source myenv/bin/activate`  
+  - Windows: `myenv\Scripts\activate`
 
-python -m venv myenv
+### Step 2: Install Dependencies
 
-activate the environment
+- Go to the directory: `cd Mybackend`
+- Install required packages:  
+  `pip install -r requirements.txt`
 
-linux: source myenv/bin/activate
+### Step 3: Run the Server
 
-windows: myenv\Scripts\activate
+- Start the server:  
+  `python manage.py runserver`
 
-step 2
+## Note
 
-go to the directory: cd Mybackend
-
-pip install -r requirements.txt
-
-step 3 
-
-python manage.py runserver
-
-
-note
-
-provided a test frontend react-native integrated with expo.dev for testing purposes
-
-
-
+- A test frontend using React Native integrated with Expo.dev is provided for testing purposes.
