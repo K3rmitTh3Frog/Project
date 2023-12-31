@@ -64,8 +64,12 @@
 - Install required packages:  
   `pip install -r requirements.txt`
 
-### Step 3: Run the Server
+### Step 3: Database Migrations and Server Start
 
+- Prepare database migrations:  
+  `python manage.py makemigrations`
+- Apply migrations:  
+  `python manage.py migrate`
 - Start the server:  
   `python manage.py runserver`
 
