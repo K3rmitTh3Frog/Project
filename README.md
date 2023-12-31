@@ -33,7 +33,8 @@
 ### Account
 
 - **OTP When Signed In**: Implement OTP verification during sign-in.
-
+- **forget password**: reset password.
+  
 ### Calendar
 
 - **Assistant**: Add assistant functionality.
