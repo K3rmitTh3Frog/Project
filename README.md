@@ -10,6 +10,7 @@ User account
 •	Change phone
 •	Change profession
 •	Confirm email registered through OTP
+•	Login using other platforms
 
 To-do-list
 
@@ -32,7 +33,6 @@ remaining functions to do
 account
 
 •	OTP when signed in
-•	Login using other platforms
 
 calendar
 
