@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
     'myaccount',
+    'django_otp.plugins.otp_totp',
 ]
 
 MIDDLEWARE = [

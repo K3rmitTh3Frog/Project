@@ -9,22 +9,7 @@ from .models import CustomUser, Event
 from rest_framework.permissions import IsAuthenticated
 
 
-def get_authenticated_user(request):
-    token = request.COOKIES.get('jwt')
 
-    if not token:
-        raise AuthenticationFailed("Unauthenticated!")
-
-    try:
-        payload = jwt.decode(token, 'secret', algorithms="HS256")
-    except jwt.ExpiredSignatureError:
-        raise AuthenticationFailed("Unauthenticated!")
-
-    user = CustomUser.objects.filter(id=payload['id']).first()
-    if user is None:
-        raise AuthenticationFailed("Unauthenticated!")
-
-    return user
 
 class CalendarView(generics.ListAPIView):
     serializer_class = CalendarSerializer
@@ -76,10 +61,10 @@ class ChangeTitleView(generics.GenericAPIView):
     serializer_class = ChangeTitleSerializer
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, Event_id):
+    def post(self, request, event_id):
         user = self.request.user
         try:
-            event_item = Event.objects.get(pk=Event_id, UserID=user)
+            event_item = Event.objects.get(pk=event_id, UserID=user)
         except Event.DoesNotExist:
             return Response({"error": "event item not found"}, status=status.HTTP_404_NOT_FOUND)
 
