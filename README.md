@@ -1,7 +1,8 @@
-working functions for the current backend code
+# Mybackend Project README
 
-User account
+## User Account Functions
 
+<<<<<<< HEAD
 •	Login
 •	Register
 •	View details
@@ -11,71 +12,84 @@ User account
 •	Change profession
 •	Confirm email registered through OTP
 •	Login using other platforms
+=======
+- **Login**: User can log in to their account.
+- **Register**: New users can create an account.
+- **View Details**: Users can view their account details.
+- **Change Email**: Allows users to update their email address.
+- **Change Password**: Users can change their account password.
+- **Change Phone**: Update the phone number associated with the account.
+- **Change Profession**: Users can update their profession details.
+- **Confirm Email**: Verify the email address registered through OTP (One-Time Password).
+- **Login using other platforms**: Facilitates logging in via different platforms.
+>>>>>>> 8b13d9924b10866a70b4584f09b990328c139a1c
 
-To-do-list
+## To-do List Features
 
-•	Create a task
-•	Mark finished tasks
-•	Delete a task
-•	Update a field (priority, etc.)
-•	View all tasks
-•	View a specific task
+- **Create a Task**: Users can add new tasks.
+- **Mark Finished Tasks**: Mark tasks as completed.
+- **Delete a Task**: Remove tasks from the list.
+- **Update a Field**: Modify task details (e.g., priority).
+- **View All Tasks**: Display all tasks.
+- **View a Specific Task**: Look at details of a particular task.
 
-Calendar
+## Calendar Functionality
 
-•	Create event
-•	Delete an event
-•	Update a field (title, etc.)
-•	View event
+- **Create Event**: Add new events.
+- **Delete an Event**: Remove events.
+- **Update a Field**: Change event details (e.g., title).
+- **View Event**: See event details.
 
-remaining functions to do
+## Remaining Functions To Implement
 
-account
+### Account
 
+<<<<<<< HEAD
 •	OTP when signed in
+=======
+- **OTP When Signed In**: Implement OTP verification during sign-in.
+- **forget password**: reset password.
+  
+### Calendar
+>>>>>>> 8b13d9924b10866a70b4584f09b990328c139a1c
 
-calendar
+- **Assistant**: Add assistant functionality.
 
-•	Assistant 
+### Emails
 
-Emails
+- **Read the Inbox (IMAP)**: Implement inbox reading via IMAP.
+- **Send an Email (IMAP)**: Enable sending emails through IMAP.
+- **Set Priority Emails**: Allow setting priority for emails based on a provided list.
 
-•	Read the inbox( IMAP)
-•	Send an email (IMAP)
-•	set priority emails from the email list provided by the user
+### Database
 
-database
+- **Integrate Viewing Security**: Enhance security through an integrated view.
 
-•	integrating view to enhance the security is missing
+## Steps to Run the Backend
 
-to run the backend 
+### Step 1: Create a New Environment
 
-step1.
+- Make a new environment (outside the Mybackend folder):  
+  `python -m venv myenv`
+- Activate the environment:  
+  - Linux: `source myenv/bin/activate`  
+  - Windows: `myenv\Scripts\activate`
 
-make a new environment (environment outside the Mybackend folder)
+### Step 2: Install Dependencies
 
-python -m venv myenv
+- Go to the directory: `cd Mybackend`
+- Install required packages:  
+  `pip install -r requirements.txt`
 
-activate the environment
+### Step 3: Database Migrations and Server Start
 
-linux: source myenv/bin/activate
+- Prepare database migrations:  
+  `python manage.py makemigrations`
+- Apply migrations:  
+  `python manage.py migrate`
+- Start the server:  
+  `python manage.py runserver`
 
-windows: myenv\Scripts\activate
+## Note
 
-step 2
-
-go to the directory: cd Mybackend
-
-pip install -r requirements.txt
-
-step 3 
-
-python manage.py runserver
-
-
-note
-
-provided a test frontend react-native integrated with expo.dev for testing purposes
-
-
-
+- A test frontend using React Native integrated with Expo.dev is provided for testing purposes.

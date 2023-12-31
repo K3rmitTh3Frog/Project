@@ -9,6 +9,6 @@ class Email(models.Model):
     Subject = models.CharField(max_length=255)  # Subject of the email
     ReceivedDate = models.DateTimeField()  # Date and time when the email was received
     IsPriority = models.IntegerField(default=0)  # Integer field to indicate the priority level of the email
-
+    Body = models.TextField()  # Adding a new field for email body
     def __str__(self):
         return f"{self.Subject} (Email ID {self.EmailID})"
