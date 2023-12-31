@@ -54,3 +54,8 @@ class UserChangeProfessionSerializer(serializers.Serializer):
 
 class UserChangePhoneSerializer(serializers.Serializer):
     new_Phone = serializers.CharField()
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(style={'input_type': 'password'}, required=True)
+

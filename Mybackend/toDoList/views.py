@@ -6,36 +6,24 @@ from rest_framework.exceptions import AuthenticationFailed
 import jwt
 from .serializers import *
 from .models import CustomUser, ToDoList
+from rest_framework.permissions import IsAuthenticated
 
 
-def get_authenticated_user(request):
-    token = request.COOKIES.get('jwt')
-
-    if not token:
-        raise AuthenticationFailed("Unauthenticated!")
-
-    try:
-        payload = jwt.decode(token, 'secret', algorithms="HS256")
-    except jwt.ExpiredSignatureError:
-        raise AuthenticationFailed("Unauthenticated!")
-
-    user = CustomUser.objects.filter(id=payload['id']).first()
-    if user is None:
-        raise AuthenticationFailed("Unauthenticated!")
-
-    return user
 
 class ToDoListView(generics.ListAPIView):
     serializer_class = ToDoListSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = get_authenticated_user(self.request)
+        user = self.request.user
         return ToDoList.objects.filter(UserID=user)
 
-class SpecificToDoListView(generics.ListAPIView):
+class SpecificToDoListView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, todo_id):
-        user = get_authenticated_user(request)
         try:
+            user = self.request.user
             todo_item = ToDoList.objects.get(pk=todo_id, UserID=user)
         except ToDoList.DoesNotExist:
             return Response({"error": "ToDoList item not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -46,16 +34,18 @@ class SpecificToDoListView(generics.ListAPIView):
             
 class createToDoListView(generics.CreateAPIView):
     serializer_class = CreateToDoListSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        user = get_authenticated_user(self.request)
-        serializer.save(UserID=user)      
+        user = self.request.user
+        serializer.save(UserID=user)   
 
 class ChangeRemindersView(generics.GenericAPIView):
     serializer_class = ChangeRemindersSerializer
-    
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, todo_id):
-        user = get_authenticated_user(request)
+        user = self.request.user
 
         # Check if the ToDoList item exists
         try:
@@ -75,12 +65,14 @@ class ChangeRemindersView(generics.GenericAPIView):
             return Response({"success": "Reminders updated successfully"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         
 class ChangePriorityView(generics.GenericAPIView):
     serializer_class = ChangePrioritySerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, todo_id):
-        user = get_authenticated_user(request)
+        user = self.request.user
         try:
             todo_item = ToDoList.objects.get(pk=todo_id, UserID=user)
         except ToDoList.DoesNotExist:
@@ -94,11 +86,13 @@ class ChangePriorityView(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ChangeDueView(generics.GenericAPIView):
     serializer_class = ChangeDueSerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, todo_id):
-        user = get_authenticated_user(request)
+        user = self.request.user
         try:
             todo_item = ToDoList.objects.get(pk=todo_id, UserID=user)
         except ToDoList.DoesNotExist:
@@ -112,11 +106,13 @@ class ChangeDueView(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ChangeDescriptionView(generics.GenericAPIView):
     serializer_class = ChangeDescriptionSerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, todo_id):
-        user = get_authenticated_user(request)
+        user = self.request.user
         try:
             todo_item = ToDoList.objects.get(pk=todo_id, UserID=user)
         except ToDoList.DoesNotExist:
@@ -130,11 +126,13 @@ class ChangeDescriptionView(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ChangeCategoryView(generics.GenericAPIView):
     serializer_class = ChangeCategorySerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, todo_id):
-        user = get_authenticated_user(request)
+        user = self.request.user
         try:
             todo_item = ToDoList.objects.get(pk=todo_id, UserID=user)
         except ToDoList.DoesNotExist:
@@ -148,11 +146,13 @@ class ChangeCategoryView(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ChangeNotesView(generics.GenericAPIView):
     serializer_class = ChangeNotesSerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, todo_id):
-        user = get_authenticated_user(request)
+        user = self.request.user
         try:
             todo_item = ToDoList.objects.get(pk=todo_id, UserID=user)
         except ToDoList.DoesNotExist:
@@ -166,11 +166,13 @@ class ChangeNotesView(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ChangeTimeEstimateView(generics.GenericAPIView):
     serializer_class = ChangeTimeEstimateSerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, todo_id):
-        user = get_authenticated_user(request)
+        user = self.request.user
         try:
             todo_item = ToDoList.objects.get(pk=todo_id, UserID=user)
         except ToDoList.DoesNotExist:
@@ -184,11 +186,13 @@ class ChangeTimeEstimateView(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ChangeStatusView(generics.GenericAPIView):
     serializer_class = ChangeStatusSerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, todo_id):
-        user = get_authenticated_user(request)
+        user = self.request.user
         try:
             todo_item = ToDoList.objects.get(pk=todo_id, UserID=user)
         except ToDoList.DoesNotExist:
@@ -202,9 +206,12 @@ class ChangeStatusView(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class DeleteToDoListView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def delete(self, request, todo_id):
-        user = get_authenticated_user(request)
+        user = self.request.user
         try:
             todo_item = ToDoList.objects.get(pk=todo_id, UserID=user)
         except ToDoList.DoesNotExist:
@@ -213,16 +220,19 @@ class DeleteToDoListView(APIView):
         # Delete the todo item
         todo_item.delete()
         return Response({"success": "ToDoList item deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
     
 class MarkToDoListView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def patch(self, request, todo_id):
-        user = get_authenticated_user(request)
+        user = self.request.user
         try:
             todo_item = ToDoList.objects.get(pk=todo_id, UserID=user)
         except ToDoList.DoesNotExist:
             return Response({"error": "ToDoList item not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Update the status to 'Marked'
+        # Update the status to 'Complete'
         todo_item.Status = 'Complete'
         todo_item.save()
 

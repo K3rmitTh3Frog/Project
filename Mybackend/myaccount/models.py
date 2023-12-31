@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.db import models
+from django.conf import settings
+
+User = settings.AUTH_USER_MODEL
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, name, phone, profession, password=None):
@@ -30,20 +33,21 @@ class CustomUserManager(BaseUserManager):
             phone=phone,
             profession=profession,
         )
-        user.is_admin = True
-        user.is_staff = True
-        user.is_superuser = True
+        user.is_staff = True  # Set is_staff to True for superusers
+        user.is_superuser = True  # Set is_superuser to True for superusers
         user.save(using=self._db)
         return user
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
     phone = models.CharField(max_length=20)
     profession = models.CharField(max_length=255)
-
+    is_staff = models.BooleanField(default=False)  # Add is_staff field
+    
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
@@ -68,3 +72,4 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         help_text=_('Specific permissions for this user.'),
         related_query_name='customuser',  # Unique related query name
     )
+    

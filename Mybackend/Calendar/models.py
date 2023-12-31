@@ -1,5 +1,5 @@
 from django.db import models
-from account.models import CustomUser  # Replace 'account' with the actual app name where CustomUser is defined
+from myaccount.models import CustomUser  # Import CustomUser from the 'myaccount' app
 
 
 class Event(models.Model):

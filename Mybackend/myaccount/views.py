@@ -1,34 +1,26 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import (
+    authenticate,
+    login,
+    logout,
+)
 from django.contrib.auth.hashers import make_password
-from django.core.validators import validate_email
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
 from rest_framework import generics, status
-from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 import jwt
 import datetime
-from .serializers import *  
-from .models import CustomUser  
+from .serializers import *
 from django.core.mail import send_mail
 import random
 
-
-def get_authenticated_user(request):
-    token = request.COOKIES.get('jwt')
-
-    if not token:
-        raise AuthenticationFailed("Unauthenticated!")
-
-    try:
-        payload = jwt.decode(token, 'secret', algorithms="HS256")
-    except jwt.ExpiredSignatureError:
-        raise AuthenticationFailed("Unauthenticated!")
-
-    user = CustomUser.objects.filter(id=payload['id']).first()
-    if user is None:
-        raise AuthenticationFailed("Unauthenticated!")
-
-    return user
 
 class UserRegistrationView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
@@ -76,52 +68,23 @@ class OTPVerificationView(generics.GenericAPIView):
         return Response({'message': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
     
 
-class UserLoginView(generics.GenericAPIView):
-    serializer_class = UserLoginSerializer
+class UserProfileView(APIView):
+    # Uncomment this if you want to restrict this view to authenticated users only
+    permission_classes = [IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = authenticate(
-            email=serializer.validated_data['email'], 
-            password=serializer.validated_data['password']
-        )
+    def get(self, request):
+        if isinstance(request.user, AnonymousUser):
+            return Response({'error': 'User is not authenticated'}, status=401)
 
-        if user:
-            payload = {
-            "id": user.id,
-            "email": user.email,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-            "iat": datetime.datetime.utcnow()
-            }
-
-            token = jwt.encode(payload, 'secret', algorithm='HS256')
-        # token.decode('utf-8')
-        #we set token via cookies
-        
-
-            response = Response() 
-            response.set_cookie(key='jwt', value=token, httponly=True)  #httonly - frontend can't access cookie, only for backend
-            response.data = {
-                'jwt token': token
-            }
-            #if password correct
-            return response
-
-        return Response({'message': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
-
-class UserProfileView(generics.RetrieveAPIView):
-    serializer_class = UserSerializer
-
-    def get_object(self):
-        # Retrieve the JWT token from the request's cookies
-        user = get_authenticated_user(self.request)
-
-        return user
+        # Directly serialize the CustomUser instance
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
 class LogoutView(generics.GenericAPIView):
     serializer_class = logoutSerializer
     def post(self,request):
+        logout(request)
         response = Response()
         response.delete_cookie('jwt')
         response.data = {
@@ -132,9 +95,10 @@ class LogoutView(generics.GenericAPIView):
     
 class ChangePasswordView(generics.GenericAPIView):
     serializer_class = UserchangePasswordSerializer
-    def post(self, request):
-        user = get_authenticated_user(request)
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request):
+        user = self.request.user
         data = request.data
         current_password = data.get("current_password")
         new_password = data.get("new_password")
@@ -142,17 +106,18 @@ class ChangePasswordView(generics.GenericAPIView):
         if not user.check_password(current_password):
             return Response({"error": "Wrong current password"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-        user.password = make_password(new_password)
+        user.set_password(new_password)
         user.save()
 
         return Response({"success": "Password updated successfully"}, status=status.HTTP_200_OK)
 
+
 class ChangeEmailView(generics.GenericAPIView):
     serializer_class = UserchangeEmailSerializer
-    
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        user = get_authenticated_user(request)
+        user = self.request.user
 
         data = request.data
         new_email = data.get("new_Email")
@@ -165,37 +130,77 @@ class ChangeEmailView(generics.GenericAPIView):
         user.email = new_email
         user.save()
 
-        return Response({"success": "Email updated successfully"}, status=status.HTTP_200_OK) 
+        return Response({"success": "Email updated successfully"}, status=status.HTTP_200_OK)
 
 
 class ChangeprofessionView(generics.GenericAPIView):
     serializer_class = UserChangeProfessionSerializer
-    
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        user = get_authenticated_user(request)
+        user = self.request.user
 
         data = request.data
-        new_Profession = data.get("new_Profession")
+        new_profession = data.get("new_Profession")
 
-
-
-        user.profession = new_Profession
+        user.profession = new_profession
         user.save()
 
-        return Response({"success": "profession updated successfully"}, status=status.HTTP_200_OK) 
+        return Response({"success": "Profession updated successfully"}, status=status.HTTP_200_OK)
+
 
 class ChangePhoneSerializer(generics.GenericAPIView):
     serializer_class = UserChangePhoneSerializer
-    
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        user = get_authenticated_user(request)
+        user = self.request.user
 
         data = request.data
-        new_Phone = data.get("new_Phone")
+        new_phone = data.get("new_Phone")
 
-
-
-        user.phone = new_Phone
+        user.phone = new_phone
         user.save()
 
-        return Response({"success": "phone updated successfully"}, status=status.HTTP_200_OK)      
+        return Response({"success": "Phone updated successfully"}, status=status.HTTP_200_OK)
+  
+class GetAuthToken(APIView):
+    authentication_classes = [SessionAuthentication]  # Use the appropriate authentication classes
+    permission_classes = [IsAuthenticated]  # Only authenticated users can access this view
+
+    def post(self, request, *args, **kwargs):
+        user = request.user  # The authenticated user
+
+        # Ensure the token is created or retrieved for the given user
+        token, created = Token.objects.get_or_create(user=user)
+
+        # Return the token key in the response
+        return Response({'token': token.key}, status=status.HTTP_200_OK)
+        
+class CSRFTokenView(APIView):
+    def get(self, request, *args, **kwargs):
+        csrf_token = get_token(request)
+        return Response({'csrfToken': csrf_token})
+    
+
+
+
+class CustomLoginView(APIView):
+    serializer_class =LoginSerializer
+    def post(self, request, *args, **kwargs):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            password = serializer.validated_data['password']
+
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                session_id = self.request.session.session_key
+
+                return JsonResponse({"session_id": session_id, "success": True})
+            else:
+                return Response({"success": False, "error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+                
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

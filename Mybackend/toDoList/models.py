@@ -1,5 +1,5 @@
 from django.db import models
-from account.models import CustomUser  # Replace 'your_app_name' with the name of your app
+from myaccount.models import CustomUser  # Replace 'your_app_name' with the name of your app
 
 class ToDoList(models.Model):
     # Primary Key
