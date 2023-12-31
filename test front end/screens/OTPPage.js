@@ -11,7 +11,7 @@ export default function OTPPage({ navigation }) {
         const response = await verifyOTP(otp);
         console.log('API Response:', response);
         if (response.message === 'Account created successfully') {
-            navigation.navigate('HOME');
+            navigation.navigate('Login');
         } else {
             // Show an error message if OTP verification failed
             alert('Invalid OTP. Please try again.');

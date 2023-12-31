@@ -1,11 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet,Alert,BackHandler,useFocusEffect  } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchUserData, logoutUser } from '../api/accountApi';
+import { useNavigation } from '@react-navigation/native';
+import { BackHandler } from 'react-native';
+
+
 export default function HomePage() {
   const [userName, setUserName] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const navigation = useNavigation();
+
+  const handleRefresh = useCallback(async () => {
+    try {
+      setIsRefreshing(true);
+      const data = await fetchUserData();
+      if (data && data.name) {
+        setUserName(data.name);
+      }
+    } catch (error) {
+      // Handle or display error as needed
+      Alert.alert('Error', 'Failed to fetch user data.');
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
     const initialize = async () => {
@@ -56,45 +83,65 @@ export default function HomePage() {
     }
   };
 
-  // Rest of the component code remains the same
-
   const handleCalendarPress = () => {
-    navigation.navigate('Calendar'); // Navigate to the "Calendar" screen
+    navigation.navigate('Calendar');
   };
 
   const handleMailInboxPress = () => {
-    navigation.navigate('Emails'); // Navigate to the "MailInbox" screen
+    navigation.navigate('Emails');
   };
 
   const handleProfilePress = () => {
-    navigation.navigate('Profile'); // Navigate to the "Profile" screen
+    navigation.navigate('Profile');
   };
+
   const handleToDOPress = () => {
-    navigation.navigate('ToDoList'); // Navigate to the "Profile" screen
+    navigation.navigate('ToDoList');
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.welcomeText}>Welcome, {userName || 'Guest'}!</Text>
-      <Text style={styles.progressText}>Your Progress: (implement a function)</Text>
-      <View style={styles.categoryContainer}>
-        <TouchableOpacity style={styles.categoryButton} onPress={handleCalendarPress}>
-          <Text style={styles.categoryButtonText}>Calendar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.categoryButton} onPress={handleMailInboxPress}>
-          <Text style={styles.categoryButtonText}>Mail Inbox</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.categoryButton} onPress={handleToDOPress}>
-          <Text style={styles.categoryButtonText}>To-Do List</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.categoryButton}>
-          <Text style={styles.categoryButtonText}>Write to Saturday</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.categoryButton} onPress={handleProfilePress}>
-          <Text style={styles.categoryButtonText}>Profile</Text>
-        </TouchableOpacity>
+    <ScrollView
+      contentContainerStyle={styles.scrollViewContainer}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+      }
+    >
+      <View style={styles.container}>
+        <Text style={styles.welcomeText}>Welcome, {userName || 'Guest'}!</Text>
+        <Text style={styles.progressText}>
+          Your Progress: (implement a function)
+        </Text>
+        <View style={styles.categoryContainer}>
+          <TouchableOpacity
+            style={styles.categoryButton}
+            onPress={handleCalendarPress}
+          >
+            <Text style={styles.categoryButtonText}>Calendar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.categoryButton}
+            onPress={handleMailInboxPress}
+          >
+            <Text style={styles.categoryButtonText}>Mail Inbox</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.categoryButton}
+            onPress={handleToDOPress}
+          >
+            <Text style={styles.categoryButtonText}>To-Do List</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.categoryButton}>
+            <Text style={styles.categoryButtonText}>Write to Saturday</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.categoryButton}
+            onPress={handleProfilePress}
+          >
+            <Text style={styles.categoryButtonText}>Profile</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -128,5 +175,8 @@ const styles = StyleSheet.create({
   categoryButtonText: {
     color: 'white',
     fontSize: 18,
+  },
+  scrollViewContainer: {
+    flexGrow: 1,
   },
 });

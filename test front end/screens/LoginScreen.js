@@ -3,25 +3,24 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { login } from '../api/accountApi';
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState('');
+  const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
-    const result = await login(email, password);
+    const result = await login(username, password);
     if (result.success) {
       navigation.navigate('Home');
     } else {
       Alert.alert('Login Failed', result.message);
     }
   };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
-        placeholder="Email" // Updated placeholder to 'Email'
-        onChangeText={text => setEmail(text)} // Updated handler to setEmail
+        placeholder="Username" // Updated placeholder to 'Email'
+        onChangeText={text => setUserName(text)} // Updated handler to setEmail
       />
       <TextInput
         style={styles.input}

@@ -1,9 +1,10 @@
-//WelcomePage.js
 import React from 'react';
-import { View, Text,TextInput, TouchableOpacity, StyleSheet,ImageBackground  } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons'; // You can use a library like @expo/vector-icons for icons
-
+import { View, Text, TouchableOpacity, ImageBackground } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons'; // For icons
 import bgImage from '../images/bg.jpg';
+
+// Assuming loginWithGitHub is defined in api.js or a similar file
+import { loginWithGitHub } from '../api/accountApi'; // Adjust the path as necessary
 
 export default function WelcomePage({ navigation }) {
   const handleLoginPress = () => {
@@ -14,6 +15,14 @@ export default function WelcomePage({ navigation }) {
     navigation.navigate('Register');
   };
 
+  const handleGitHubLoginPress = () => {
+    loginWithGitHub().then(() => {
+      // Handle successful login if needed
+    }).catch(error => {
+      console.error('GitHub Login Failed:', error);
+    });
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground
@@ -22,10 +31,10 @@ export default function WelcomePage({ navigation }) {
       >
         <View style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
           <Text style={{ textAlign: 'center', fontSize: 24, color: 'white', marginTop: 20 }}>
-            Welcome to saturday
+            Welcome to Saturday
           </Text>
           <Text style={{ textAlign: 'center', fontSize: 16, color: 'white', marginHorizontal: 20, marginBottom: 20 }}>
-            I am your virtual personal assistent
+            I am your virtual personal assistant
           </Text>
         </View>
       </ImageBackground>
@@ -39,8 +48,8 @@ export default function WelcomePage({ navigation }) {
           <TouchableOpacity style={{ backgroundColor: 'blue', padding: 10, borderRadius: 5, marginRight: 10 }}>
             <FontAwesome name="facebook" size={20} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity style={{ backgroundColor: 'blue', padding: 10, borderRadius: 5 }}>
-            <FontAwesome name="twitter" size={20} color="white" />
+          <TouchableOpacity style={{ backgroundColor: 'blue', padding: 10, borderRadius: 5 }} onPress={handleGitHubLoginPress}>
+            <FontAwesome name="github" size={20} color="white" />
           </TouchableOpacity>
         </View>
         <Text style={{ textAlign: 'center', color: 'white', marginBottom: 10 }}>or</Text>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Switch } from 'react-native';
 import { changePassword } from '../api/accountApi';
-export default function ProfileScreen() {
+
+export default function ProfileScreen({ navigation }) {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -12,15 +13,34 @@ export default function ProfileScreen() {
   };
 
   const handleChangePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'New passwords do not match.');
-      return;
+    try {
+      if (newPassword !== confirmPassword) {
+        Alert.alert('Error', 'New passwords do not match.');
+        return;
+      }
+
+      // Further password validation logic if necessary
+
+      const result = await changePassword(currentPassword, newPassword);
+
+      if (result.success) {
+        Alert.alert('Success', result.message);
+        navigation.navigate('Login');
+      } else {
+        // Handle error cases
+        if (result.message === 'Authentication failed') {
+          // Handle authentication failure, e.g., invalid session
+          Alert.alert('Error', 'Authentication failed. Please log in again.');
+          // You might want to navigate to the login screen here or take appropriate action
+        } else {
+          // Handle other error cases
+          Alert.alert('Error', result.message);
+        }
+      }
+    } catch (error) {
+      console.error('Error while changing password', error);
+      Alert.alert('Error', 'An unexpected error occurred.');
     }
-
-    // Further password validation logic if necessary
-
-    const result = await changePassword(currentPassword, newPassword);
-    Alert.alert(result.success ? 'Success' : 'Error', result.message);
   };
 
   return (

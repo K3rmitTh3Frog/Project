@@ -2,26 +2,31 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = 'http://192.168.0.154:8081/todolist/'; // Replace with your API URL
 
-// Helper function to get the authentication token
-const getToken = async () => {
-  const token = await AsyncStorage.getItem('userToken');
-  return token;
-};
+async function fetchCsrfToken() {
+  try {
+    const response = await fetch(`http://192.168.0.154:8081/accounts/csrf-token/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    await AsyncStorage.setItem('csrfToken', data.csrfToken);
+  } catch (error) {
+    console.error('Error fetching CSRF token:', error);
+  }
+}
 
 // Function to fetch to-do lists
 export async function fetchTodoLists() {
   try {
-    // Retrieve the token from AsyncStorage
-    const token = await AsyncStorage.getItem('userToken');
-    // Check if the token is available
-    if (!token) {
-      return { success: false, message: 'Authentication token not found' };
-    }
+    await fetchCsrfToken();
+
+    const csrfToken = await AsyncStorage.getItem('csrfToken');
+    const session_id = await AsyncStorage.getItem('session_id'); // Get the session ID from AsyncStorage
+    
     const response = await fetch(`${API_URL}viewall/`, {
-      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'jwt': `Bearer ${token}` // Include the token in the Authorization header
+        'X-CSRFToken': csrfToken,
+        'Authorization': `Bearer ${session_id}`,
       },
     });
 
@@ -39,14 +44,19 @@ export async function fetchTodoLists() {
 
 // Function to create a new to-do list
 export const createTodoList = async (newTodoListData) => {
-  const token = await getToken(); // Make sure getToken() is defined and retrieves the JWT token
 
   try {
+    await fetchCsrfToken();
+
+    const csrfToken = await AsyncStorage.getItem('csrfToken');
+    const session_id = await AsyncStorage.getItem('session_id'); // Get the session ID from AsyncStorage
+
     const response = await fetch(`${API_URL}create/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'jwt': `Bearer ${token}` // Changed to 'Authorization' for standard JWT usage
+        'X-CSRFToken': csrfToken,
+        'Authorization': `Bearer ${session_id}`, // Add authentication token
       },
       body: JSON.stringify(newTodoListData),
     });
@@ -65,14 +75,17 @@ export const createTodoList = async (newTodoListData) => {
 }
 
 export const markTodoList = async (todoId) => {
-  const token = await getToken(); // Retrieve the authentication token
+  await fetchCsrfToken();
 
+  const csrfToken = await AsyncStorage.getItem('csrfToken');
+  const session_id = await AsyncStorage.getItem('session_id'); // Get the session ID from AsyncStorage
   try {
     const response = await fetch(`${API_URL}mark/${todoId}/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'jwt': `Bearer ${token}` // Include the token in the Authorization header
+        'X-CSRFToken': csrfToken,
+        'Authorization': `Bearer ${session_id}`, // Add authentication token
       },
       body: JSON.stringify({}), // Sending an empty JSON object
     });
@@ -90,18 +103,22 @@ export const markTodoList = async (todoId) => {
 }
 
 export const deleteTodoList = async (todoId) => {
-  const token = await getToken(); // Retrieve the authentication token
+  await fetchCsrfToken();
+
+  const csrfToken = await AsyncStorage.getItem('csrfToken');
+  const session_id = await AsyncStorage.getItem('session_id'); // Get the session ID from AsyncStorage
 
   try {
     const response = await fetch(`${API_URL}delete/${todoId}/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'jwt': `Bearer ${token}` // Include the token in the Authorization header
+        'X-CSRFToken': csrfToken,
+        'Authorization': `Bearer ${session_id}`, // Add authentication token
       },
     });
 
-    if (response.ok) {
+    if (response.status === 200 || response.status === 201) {
       return { success: true, message: 'To-do list deleted successfully' };
     } else {
       const errorData = await response.json();
