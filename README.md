@@ -28,6 +28,11 @@
 - **Update a Field**: Change event details (e.g., title).
 - **View Event**: See event details.
 
+## emails
+
+- **Read the Inbox (IMAP)**: Implement inbox reading via IMAP.
+- **Set Priority Emails**: Allow setting priority for emails based on a provided list.
+
 ## Remaining Functions To Implement
 
 ### Account
@@ -41,9 +46,7 @@
 
 ### Emails
 
-- **Read the Inbox (IMAP)**: Implement inbox reading via IMAP.
 - **Send an Email (IMAP)**: Enable sending emails through IMAP.
-- **Set Priority Emails**: Allow setting priority for emails based on a provided list.
 
 ### Database
 
