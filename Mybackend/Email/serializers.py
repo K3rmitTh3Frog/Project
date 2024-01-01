@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Email  # Import the Email model
+from .models import Email,PriorityEmail  # Import the Email model
 
 class EmailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,3 +21,32 @@ class CreateEmailSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Here you can add custom creation logic if necessary.
         return Email.objects.create(**validated_data)
+
+class PriorityEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PriorityEmail
+        fields = '__all__'  # This will include all fields of the PriorityEmail model
+
+class CreatePriorityEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PriorityEmail
+        fields = ['PriorityID', 'EmailAddress']
+        # UserID is not included here as it will be added from the request user
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        # Exclude UserID from validated_data if it's accidentally included
+        validated_data.pop('UserID', None)
+        return PriorityEmail.objects.create(UserID=user, **validated_data)
+
+
+class ChangePrioritySerializer(serializers.Serializer):
+    new_IsPriority = serializers.IntegerField()
+
+    class Meta:
+        fields = ['new_IsPriority']
+
+    def update(self, instance, validated_data):
+        instance.IsPriority = validated_data.get('new_IsPriority', instance.IsPriority)
+        instance.save()
+        return instance

@@ -59,3 +59,9 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(style={'input_type': 'password'}, required=True)
 
+
+#move to email serializers
+class SendEmailSerializer(serializers.Serializer):
+    to = serializers.EmailField()
+    subject = serializers.CharField(max_length=255)
+    message = serializers.CharField()

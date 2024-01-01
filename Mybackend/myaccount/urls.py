@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='register'),
@@ -13,4 +14,6 @@ urlpatterns = [
     path('csrf-token/', CSRFTokenView.as_view(), name='csrf-token'),
     path('api/get-auth-token/', GetAuthToken.as_view(), name='get_authentication_token'),
     path('login2/', CustomLoginView.as_view(), name='login test'),
+    path('gmail_authenticate/', GmailAuthenticator.as_view(), name='gmail_authenticate'),
+    path('callback/', OAuth2CallbackView.as_view(), name='oauth2callback'),
 ]

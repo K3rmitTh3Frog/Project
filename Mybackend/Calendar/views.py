@@ -176,3 +176,31 @@ class ChangeEndTimeView(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+from django.http import JsonResponse
+from .scripts.googlemaps import get_directions,get_duration    # Adjust the import path as necessary
+
+def directions_view(request):
+    # You can get parameters from the request (e.g., query parameters)
+    origin = request.GET.get('origin')
+    destination = request.GET.get('destination')
+    mode = request.GET.get('mode')
+
+    if not all([origin, destination, mode]):
+        return JsonResponse({"error": "Missing parameters"}, status=400)
+
+    directions = get_directions(origin, destination, mode)
+    return JsonResponse(directions)
+
+def duration_view(request):
+    origin = request.GET.get('origin')
+    destination = request.GET.get('destination')
+    mode = request.GET.get('mode')
+
+    if not all([origin, destination, mode]):
+        return JsonResponse({"error": "Missing parameters"}, status=400)
+
+    duration = get_duration(origin, destination, mode)
+    if "Error" in duration:
+        return JsonResponse({"error": duration}, status=500)
+    return JsonResponse({"duration": duration})

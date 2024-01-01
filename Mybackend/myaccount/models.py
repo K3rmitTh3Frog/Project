@@ -47,7 +47,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=20)
     profession = models.CharField(max_length=255)
     is_staff = models.BooleanField(default=False)  # Add is_staff field
-    
+    gmail_credentials = models.TextField(null=True, blank=True)
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'

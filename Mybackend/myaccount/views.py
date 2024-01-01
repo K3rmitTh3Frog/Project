@@ -3,6 +3,12 @@ from django.contrib.auth import (
     login,
     logout,
 )
+from django.contrib import messages
+
+from django.conf import settings
+import os
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+import os
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
@@ -20,7 +26,19 @@ import datetime
 from .serializers import *
 from django.core.mail import send_mail
 import random
-
+from google_auth_oauthlib.flow import Flow
+from django.shortcuts import redirect
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.http import HttpResponse
+import json
+from django.http import JsonResponse
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 
 class UserRegistrationView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
@@ -66,7 +84,6 @@ class OTPVerificationView(generics.GenericAPIView):
             return Response({'message': 'Account created successfully'}, status=status.HTTP_201_CREATED)
 
         return Response({'message': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
-    
 
 class UserProfileView(APIView):
     # Uncomment this if you want to restrict this view to authenticated users only
@@ -111,7 +128,6 @@ class ChangePasswordView(generics.GenericAPIView):
 
         return Response({"success": "Password updated successfully"}, status=status.HTTP_200_OK)
 
-
 class ChangeEmailView(generics.GenericAPIView):
     serializer_class = UserchangeEmailSerializer
     permission_classes = [IsAuthenticated]
@@ -132,7 +148,6 @@ class ChangeEmailView(generics.GenericAPIView):
 
         return Response({"success": "Email updated successfully"}, status=status.HTTP_200_OK)
 
-
 class ChangeprofessionView(generics.GenericAPIView):
     serializer_class = UserChangeProfessionSerializer
     permission_classes = [IsAuthenticated]
@@ -147,7 +162,6 @@ class ChangeprofessionView(generics.GenericAPIView):
         user.save()
 
         return Response({"success": "Profession updated successfully"}, status=status.HTTP_200_OK)
-
 
 class ChangePhoneSerializer(generics.GenericAPIView):
     serializer_class = UserChangePhoneSerializer
@@ -182,9 +196,6 @@ class CSRFTokenView(APIView):
         csrf_token = get_token(request)
         return Response({'csrfToken': csrf_token})
     
-
-
-
 class CustomLoginView(APIView):
     serializer_class =LoginSerializer
     def post(self, request, *args, **kwargs):
@@ -204,3 +215,61 @@ class CustomLoginView(APIView):
                 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class GmailAuthenticator(APIView):
+    permission_classes = [IsAuthenticated]
+    client_secrets_file = r'C:\321 project\Mybackend\myaccount\client_secrets.json'
+    scopes = ['https://www.googleapis.com/auth/gmail.readonly']
+    redirect_uri = 'http://127.0.0.1:8000/accounts/callback/'
+
+    def get_flow(self):
+        return Flow.from_client_secrets_file(
+            self.client_secrets_file,
+            scopes=self.scopes,
+            redirect_uri=self.redirect_uri
+        )
+
+    def get(self, request):
+        flow = self.get_flow()
+        authorization_url, state = flow.authorization_url()
+        request.session['state'] = state
+        return redirect(authorization_url)
+
+class OAuth2CallbackView(APIView):
+    permission_classes = [IsAuthenticated]
+    client_secrets_file = r'C:\321 project\Mybackend\myaccount\client_secrets.json'
+    scopes = ['https://www.googleapis.com/auth/gmail.readonly']
+    redirect_uri = 'http://127.0.0.1:8000/accounts/callback/'
+
+    def get_flow(self):
+        return Flow.from_client_secrets_file(
+            self.client_secrets_file,
+            scopes=self.scopes,
+            redirect_uri=self.redirect_uri
+        )
+
+    def get(self, request):
+        state = request.session['state']
+        flow = self.get_flow()
+        try:
+            flow.fetch_token(authorization_response=request.get_full_path())
+            credentials = flow.credentials
+            serialized_credentials = credentials.to_json()
+
+            user = request.user
+            if user.is_authenticated:
+                user.gmail_credentials = serialized_credentials
+                user.save()
+                message = 'Your Gmail account has been successfully linked.'
+            else:
+                message = 'You need to be logged in to link your Gmail account.'
+        except Exception as e:
+            message = f'An error occurred: {str(e)}'
+            return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"success": message}, status=status.HTTP_200_OK)
+    
+
+
+
+    
