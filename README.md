@@ -11,6 +11,7 @@
 - **Change Profession**: Users can update their profession details.
 - **Confirm Email**: Verify the email address registered through OTP (One-Time Password).
 - **Login using other platforms**: Facilitates logging in via different platforms.
+- **Forgot Password**: Implement password reset functionality.
 
 ## To-do List Features
 
@@ -38,7 +39,6 @@
 ### Account
 
 - **OTP When Signed In**: Implement OTP verification during sign-in.
-- **Forgot Password**: Implement password reset functionality.
 
 ### Calendar
 
