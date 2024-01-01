@@ -30,7 +30,7 @@
 
 ## emails
 
-- **Read the Inbox (IMAP)**: Implement inbox reading via IMAP.
+- **Read the Inbox (OAuth)**: Implement inbox reading via OAuth and google gmail api.
 - **Set Priority Emails**: Allow setting priority for emails based on a provided list.
 
 ## Remaining Functions To Implement
@@ -46,7 +46,7 @@
 
 ### Emails
 
-- **Send an Email (IMAP)**: Enable sending emails through IMAP.
+- **Send an Email (OAuth)**: Enable sending emails through OAuth and google gmail api.
 
 ### Database
 
