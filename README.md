@@ -11,6 +11,7 @@
 - **Change Profession**: Users can update their profession details.
 - **Confirm Email**: Verify the email address registered through OTP (One-Time Password).
 - **Login using other platforms**: Facilitates logging in via different platforms.
+- **Forgot Password**: Implement password reset functionality.
 
 ## To-do List Features
 
@@ -27,23 +28,23 @@
 - **Delete an Event**: Remove events.
 - **Update a Field**: Change event details (e.g., title).
 - **View Event**: See event details.
-
-## Remaining Functions To Implement
-
-### Account
-
-- **OTP When Signed In**: Implement OTP verification during sign-in.
-- **Forgot Password**: Implement password reset functionality.
-
-### Calendar
-
-- **Assistant**: Add assistant functionality.
+- **Assistant**: the code checks if the user can arrive on time
 
 ### Emails
 
 - **Read the Inbox (IMAP)**: Implement inbox reading via IMAP.
 - **Send an Email (IMAP)**: Enable sending emails through IMAP.
 - **Set Priority Emails**: Allow setting priority for emails based on a provided list.
+
+## Remaining Functions To Implement
+
+### Account
+
+- **OTP When Signed In**: Implement OTP verification during sign-in.
+
+### Calendar
+
+### Emails
 
 ### Database
 
