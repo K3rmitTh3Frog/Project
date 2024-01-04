@@ -83,7 +83,7 @@
 **Author:** Hamzeh Hirzalla
 
 ### Copyright Notice
-All rights reserved. The test front-end, including all associated code and documentation in this repository, is the exclusive property of Hamzeh Hirzalla.
+All rights reserved. The test front-end, including all associated code and documentation in this repository related to the front end, is the exclusive property of Hamzeh Hirzalla.
 
 ### Usage Restrictions
 This test front-end is private and proprietary. As the sole author and copyright holder, I, Hamzeh Hirzalla, reserve all rights to the use, distribution, and publication of the test front-end. No other individual or entity is authorized to use, reproduce, distribute, or publish this test front-end in any form or for any purpose, without explicit written permission from me.
