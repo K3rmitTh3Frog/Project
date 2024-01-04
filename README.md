@@ -75,11 +75,6 @@
 - Start the server:  
   `python manage.py runserver`
 
-## Note
-
-- A test frontend using React Native integrated with Expo.dev is provided for testing purposes.
-  To create a legally binding statement for your README file on GitHub, it's important to clearly state your terms. Here's a suggested wording:
-
 ---
 
 ## License and Usage Rights
