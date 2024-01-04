@@ -93,7 +93,6 @@ Unauthorized use, reproduction, distribution, or publication of this test front-
 
 ### Contact Information
 For permissions or inquiries, please contact [0544675125].
-Certainly, you can add a section to your README that addresses the use of deleted API call functions. Here's how you could word it:
 
 ---
 
@@ -111,8 +110,6 @@ Any individual or entity who has downloaded or otherwise obtained these deleted 
 ### Legal Implications
 Unauthorized use of any deleted content from this repository will be subject to the same legal actions as unauthorized use of current content, as detailed above.
 
----
-Certainly, you can add a section to your README that specifies the intended purpose of the test front end and API, and restricts its use for certain projects, such as the final project subject at the University of Wollongong in Dubai (UOWD) or by any other entity. Here's an example of how you could word it:
 
 ---
 
