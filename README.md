@@ -124,6 +124,25 @@ It is specifically noted that the test front end and API are not to be used as p
 ### Prohibition on Use by External Entities
 Furthermore, no external entity, including but not limited to businesses, organizations, or individuals, is authorized to use the test front end and API for any commercial or non-commercial purpose. This includes, but is not limited to, development, research, and publication purposes.
 
+---
+## Statement of Ownership and Restriction on Use for University Project
+
+### Sole Authorship Declaration
+I, Hamzeh Hirzalla, hereby declare that the test front-end and all associated API calls contained in this repository are the result of my individual effort and were developed entirely for my personal use. These components were neither part of a collaborative team effort in the context of the university project nor were they developed with the intention of being integrated into any group assignments or projects.
+
+### Restriction on Use for University Project
+Given the above declaration, it is explicitly stated that no member of my university project team, nor any other student or faculty member, is authorized to use, copy, modify, or distribute the test front-end and associated APIs for the university project or any related academic work. This restriction is put in place to maintain the integrity of individual contributions within academic settings.
+
+### No Prior Agreement
+At no point was there an agreement, implicit or explicit, that allowed for the incorporation of my personal test front-end and API calls into the university project or for their use by other team members.
+
+### Legal Implications
+Any use of the test front-end and associated APIs without my explicit permission may be considered a violation of my intellectual property rights and could lead to legal repercussions.
+
+### Contact for Permissions and Inquiries
+Should any team member or other party wish to discuss the potential use of the test front-end and API calls for academic or other purposes, they should contact me directly at [0544675125].
+
+
 ### Legal Implications
 Any unauthorized use of the test front end and API, in violation of these terms, will be subject to legal actions for infringement of copyright and breach of these terms.
 
