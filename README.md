@@ -80,7 +80,7 @@
 ## License and Usage Rights
 
 ### Author and Copyright Holder
-**Author:** Hamzeh Hirzalla
+**Author:** Hamzeh Hirzalla, Majd Zeino, Masooma, Jouman Gharaibeh, Mohammed shar. 
 
 ### Copyright Notice
 All rights reserved. The test front-end, including all associated code and documentation in this repository related to the front end, is the exclusive property of Hamzeh Hirzalla.
