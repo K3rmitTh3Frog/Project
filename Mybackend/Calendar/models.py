@@ -12,8 +12,9 @@ class Event(models.Model):
     EndDate = models.DateField()  
     EndTime = models.TimeField()
     Destination = models.CharField(max_length=255, null=True)  # New field that can be null
+    isDeleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    
     def __str__(self):
         return f"{self.Title} (Event ID {self.EventID})"

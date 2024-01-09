@@ -3,7 +3,7 @@ from .views import *
 from . import views
 
 urlpatterns = [
-    path('view/', EmailView.as_view(), name='list all emails'),
+    path('view/', EmailView.as_view(), name='list all emails+fitch'),
     path('view-database/', EmailViewNoRefresh.as_view(), name='list all emails'),
     path('create/', CreateEmail.as_view(), name='create an event'),
     path('delete/<int:EmailID>/', DeleteEmailView.as_view(), name='delete an event'),

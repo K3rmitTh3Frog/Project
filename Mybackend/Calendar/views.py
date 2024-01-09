@@ -190,7 +190,6 @@ class ChangeEndTimeView(generics.GenericAPIView):
 
 
 def directions_view(request):
-    # You can get parameters from the request (e.g., query parameters)
     origin = request.GET.get('origin')
     destination = request.GET.get('destination')
     mode = request.GET.get('mode')
@@ -274,6 +273,7 @@ def duration_view(request):
         return JsonResponse({"error": duration}, status=500)
     return JsonResponse({"duration": duration})
 
+#example:http://172.20.10.3:8081/calendar/duration/?origin=University+of+Wollongong+in+Dubai&destination=Dubai+Mall&mode=driving&
 class CreateCalendarDurationCheckView(generics.CreateAPIView):
     serializer_class = CreateCalendatSerializer
     permission_classes = [IsAuthenticated]

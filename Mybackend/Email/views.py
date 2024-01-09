@@ -76,7 +76,7 @@ class EmailViewNoRefresh(generics.ListAPIView):
     def get_queryset(self):
         
         user = self.request.user
-        return Email.objects.filter(UserID=user).order_by('-ReceivedDate')
+        return Email.objects.filter(UserID=user, isDeleted=False).order_by('-ReceivedDate')
     
 class CreateEmail(generics.CreateAPIView):
     serializer_class = CreateEmailSerializer
@@ -92,13 +92,14 @@ class DeleteEmailView(APIView):
     def delete(self, request, EmailID):
         user = self.request.user
         try:
-            todo_item = Email.objects.get(pk=EmailID, UserID=user)
+            email_item = Email.objects.get(pk=EmailID, UserID=user)
         except Email.DoesNotExist:
             return Response({"error": "email item not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Delete the todo item
-        todo_item.delete()
-        return Response({"success": "email item deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        email_item.isDeleted = True
+        email_item.save()
+
+        return Response({"success": "email item marked as deleted"}, status=status.HTTP_204_NO_CONTENT)
     
 class SpecificEmailView(generics.ListAPIView):
     serializer_class = EmailSerializer
@@ -298,3 +299,4 @@ class ListEmailsView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return HttpResponse("Emails fetched and stored successfully.")
+    
