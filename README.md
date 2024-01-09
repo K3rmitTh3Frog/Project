@@ -33,7 +33,7 @@
 
 ## email Functionality
 
-- **Read the Inbox (IMAP)**: Implement inbox reading via IMAP.
+- **Read the Inbox (IMAP)**: Implement inbox reading via gmial API.
 - **Set Priority Emails**: Allow setting priority for emails based on a provided list.
 
 ## Remaining Functions To Implement
@@ -43,8 +43,6 @@
 - **OTP When Signed In**: Implement OTP verification during sign-in.
 
 ### Calendar
-
-
 
 ### Emails
 
