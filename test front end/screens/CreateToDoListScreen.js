@@ -17,29 +17,42 @@ const CreateToDoListScreen = ({ navigation }) => {
 
     const handleCreateToDoList = async () => {
         try {
-            const newTodoListData = {
-                Description: description,
-                Priority: parseInt(priority, 10),
-                Due: dueDate.toISOString(),
-                Category: category,
-                Notes: notes,
-                Time_Estimate: timeEstimate,
-                Reminders: reminders.toISOString(),
-                Status: status
-            };
-            const response = await createTodoList(newTodoListData);
-
-            if (response.success) {
-                Alert.alert('Success', 'To-Do List created successfully');
-                navigation.goBack();
-            } else {
-                Alert.alert('Error', response.message || 'Failed to create To-Do List');
-            }
+          console.log('description:', description);
+          console.log('priority:', priority);
+          console.log('dueDate:', dueDate);
+          console.log('category:', category);
+          console.log('notes:', notes);
+          console.log('timeEstimate:', timeEstimate);
+          console.log('reminders:', reminders);
+          console.log('status:', status);
+      
+          const newTodoListData = {
+            Description: description,
+            Priority: parseInt(priority, 10),
+            Due: dueDate.toISOString(),
+            Category: category,
+            Notes: notes,
+            Time_Estimate: timeEstimate,
+            Reminders: reminders.toISOString(),
+            Status: status,
+          };
+      
+          console.log('newTodoListData:', newTodoListData);
+      
+          const response = await createTodoList(newTodoListData);
+      
+          if (response.success) {
+            Alert.alert('Success', 'To-Do List created successfully');
+            navigation.goBack();
+          } else {
+            Alert.alert('Error', response.message || 'Failed to create To-Do List');
+          }
         } catch (error) {
-            console.error(error);
-            Alert.alert('Error', 'Failed to create To-Do List');
+          console.error(error);
+          Alert.alert('Error', 'Failed to create To-Do List');
         }
-    };
+      };
+      
 
     const showDatePicker = () => {
         setDatePickerVisibility(true);
