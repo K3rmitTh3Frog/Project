@@ -77,9 +77,6 @@
 - Start the server:  
   `python manage.py runserver`
 
----
-### Legal Implications
-Any unauthorized use of the test front end and API, in violation of these terms, will be subject to legal actions for infringement of copyright and breach of these terms.
 
 ---
 
