@@ -1,10 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://54.236.7.246/todolist/'; // Replace with your API URL
+const API_URL = 'http://3.93.164.156/todolist/'; // Replace with your API URL
 
 async function fetchCsrfToken() {
   try {
-    const response = await fetch(`http://54.236.7.246/accounts/csrf-token/`);
+    const response = await fetch(`http://3.93.164.156/accounts/csrf-token/`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -15,7 +15,6 @@ async function fetchCsrfToken() {
   }
 }
 
-// Function to fetch to-do lists
 export async function fetchTodoLists() {
   try {
     await fetchCsrfToken();

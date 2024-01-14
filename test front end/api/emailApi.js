@@ -1,10 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BASE_URL = 'http://54.236.7.246/email'; // Replace with your Django API URL
+const BASE_URL = 'http://3.93.164.156/email'; // Replace with your Django API URL
 
 async function fetchCsrfToken() {
   try {
-    const response = await fetch(`http://54.236.7.246/accounts/csrf-token/`);
+    const response = await fetch(`http://3.93.164.156/accounts/csrf-token/`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

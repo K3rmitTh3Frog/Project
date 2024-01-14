@@ -1,7 +1,7 @@
 // api.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BASE_URL = 'http://54.236.7.246/accounts';
+const BASE_URL = 'http://3.93.164.156/accounts';
 
 import { Linking } from 'react-native';
 

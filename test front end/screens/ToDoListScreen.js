@@ -81,7 +81,7 @@ const ToDoListScreen = ({ navigation }) => {
     if (selectedItem && selectedItem.ToDoID) {
       try {
         // Update the task using the API function, passing editedTask
-        const response = await updateTodoList(selectedItem.ToDoID, editedTask);
+        //const response = await updateTodoList(selectedItem.ToDoID, editedTask);
         if (response.success) {
           console.log('To-Do List updated successfully:', response);
           refreshToDoLists();

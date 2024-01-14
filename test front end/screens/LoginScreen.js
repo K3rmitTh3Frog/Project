@@ -8,6 +8,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     const result = await login(username, password);
+    console.log(result);
     if (result.success) {
       navigation.navigate('Home');
     } else {
