@@ -1,4 +1,4 @@
-### fetchCsrfToken
+### fetchCsrfToken (done)
 - **Purpose**: Retrieves a CSRF token from the server and stores it in AsyncStorage.
 - **Method**: GET
 - **Endpoint**: `/accounts/csrf-token/`
@@ -11,7 +11,7 @@
   - **Code**: 4XX/5XX (e.g., 404 NOT FOUND, 500 INTERNAL SERVER ERROR)
   - **Content**: Error message detailing the issue.
 
-### fetchEmails
+### fetchEmails (done)
 - **Purpose**: Fetches a list of emails.
 - **Method**: GET
 - **Endpoint**: `/email/view/`
@@ -24,7 +24,7 @@
   - **Code**: 401 UNAUTHORIZED, 404 NOT FOUND, etc.
   - **Content**: Error message explaining the problem.
 
-### fetchEmailsNoRefresh
+### fetchEmailsNoRefresh (done)
 - **Purpose**: Fetches emails directly from the database without refreshing.
 - **Method**: GET
 - **Endpoint**: `/email/view-database/`
@@ -37,7 +37,7 @@
   - **Code**: 401 UNAUTHORIZED, 404 NOT FOUND, etc.
   - **Content**: Error message explaining the failure.
 
-### fetchPriorityEmails
+### fetchPriorityEmails (done)
 - **Purpose**: Retrieves a list of priority emails.
 - **Method**: GET
 - **Endpoint**: `/email/view-priority-emails/`
@@ -50,7 +50,7 @@
   - **Code**: 401 UNAUTHORIZED, 404 NOT FOUND, etc.
   - **Content**: Error message detailing the issue.
 
-### addPriorityEmail
+### addPriorityEmail (done)
 - **Purpose**: Adds an email address to the priority list.
 - **Method**: POST
 - **Endpoint**: `/email/add-priority-email/`
@@ -63,7 +63,12 @@
   - **Code**: 400 BAD REQUEST, 401 UNAUTHORIZED, etc.
   - **Content**: Error message explaining the failure.
 
-### deletePriorityEmail
+{
+  "EmailAddress": "user@example.com"
+}
+
+
+### deletePriorityEmail (done)
 - **Purpose**: Deletes an email from the priority list.
 - **Method**: DELETE
 - **Endpoint**: `/email/delete-priority-email/{priorityId}/`
@@ -75,7 +80,7 @@
   - **Code**: 400 BAD REQUEST, 401 UNAUTHORIZED, etc.
   - **Content**: Error message detailing the issue.
 
-### deleteEmail
+### deleteEmail (done)
 - **Purpose**: Deletes an email.
 - **Method**: DELETE
 - **Endpoint**: `/email/delete/{emailId}/`
@@ -87,7 +92,7 @@
   - **Code**: 400 BAD REQUEST, 401 UNAUTHORIZED, etc.
   - **Content**: Error message explaining the failure.
 
-### changeEmailPriority
+### changeEmailPriority (done)
 - **Purpose**: Changes the priority status of an email.
 - **Method**: POST
 - **Endpoint**: `/email/change-priority/{email_id}/`
@@ -100,25 +105,25 @@
   - **Code**: 400 BAD REQUEST, 401 UNAUTHORIZED, etc.
   - **Content**: `{ success: false, message: string }`
 
+..........................................................................
 
-
-### fetchTodoLists
+### fetchTodoLists (done)
 - **Purpose**: Fetches a list of to-do lists.
 - **Method**: GET
-- **Endpoint**: `${API_URL}viewall/`
+- **Endpoint**: `/todolist/viewall/`
 - **Headers**: X-CSRFToken, Authorization (Bearer token)
 - **Body**: None
 - **Success Response**:
   - **Code**: 200 OK
   - **Content**: Array of to-do list objects.
 - **Error Response**:
-  - **Code**: 4XX/5XX (e.g., 401 UNAUTHORIZED, 404 NOT FOUND)
+  - **Code**: 4XX/5XX (e.g., 401 UNAUTHORIZED)
   - **Content**: Error message detailing the failure.
 
-### createTodoList
+### createTodoList (done)
 - **Purpose**: Creates a new to-do list.
 - **Method**: POST
-- **Endpoint**: `${API_URL}create/`
+- **Endpoint**: `/todolist/create/`
 - **Headers**: Content-Type (application/json), X-CSRFToken, Authorization (Bearer token)
 - **Body**: JSON containing `newTodoListData`
 - **Success Response**:
@@ -128,10 +133,22 @@
   - **Code**: 4XX/5XX (e.g., 400 BAD REQUEST, 401 UNAUTHORIZED)
   - **Content**: `{ success: false, message: string }`
 
-### markTodoList
+{
+  "Priority": 0,
+  "Due": "2024-02-26T23:55:26.699Z",
+  "Description": "string",
+  "Category": "string",
+  "Notes": "string",
+  "Time_Estimate": "10:00",
+  "Reminders": "2024-02-26T23:55:26.699Z",
+  "Status": "In Progress"
+}
+
+
+### markTodoList (done)
 - **Purpose**: Marks a specified to-do list item.
 - **Method**: PATCH
-- **Endpoint**: `${API_URL}mark/${todoId}/`
+- **Endpoint**: `/todolist/mark/${todoId}/`
 - **Headers**: Content-Type (application/json), X-CSRFToken, Authorization (Bearer token)
 - **Body**: Empty JSON object
 - **Success Response**:
@@ -141,19 +158,20 @@
   - **Code**: 4XX/5XX (e.g., 400 BAD REQUEST, 401 UNAUTHORIZED)
   - **Content**: `{ success: false, message: string }`
 
-### deleteTodoList
+### deleteTodoList (done)
 - **Purpose**: Deletes a specified to-do list item.
 - **Method**: DELETE
-- **Endpoint**: `${API_URL}delete/${todoId}/`
+- **Endpoint**: `/todolist/delete/${todoId}/`
 - **Headers**: Content-Type (application/json), X-CSRFToken, Authorization (Bearer token)
 - **Body**: None
 - **Success Response**:
-  - **Code**: 200 OK / 201 Created
+  - **Code**: 204
   - **Content**: `{ success: true, message: 'To-do list deleted successfully' }`
 - **Error Response**:
-  - **Code**: 4XX/5XX (e.g., 400 BAD REQUEST, 401 UNAUTHORIZED)
+  - **Code**: 4XX/5XX (e.g., 400 BAD REQUEST, 401 UNAUTHORIZED, 404 Not Found)
   - **Content**: `{ success: false, message: string }`
 
+................................................................................................
 ### loginWithGitHub
 - **Purpose**: Initiates GitHub login process.
 - **Method**: GET (Browser Link Opening)
@@ -162,46 +180,58 @@
 - **Body**: None
 - **Note**: The backend should handle the redirect after login and possibly send a deep link back to the app.
 
-### fetchCsrfToken
-- **Purpose**: Retrieves a CSRF token and stores it in AsyncStorage.
-- **Method**: GET
-- **Endpoint**: `${BASE_URL}/csrf-token/`
-- **Headers**: None
-- **Body**: None
-- **Note**: Error handling for non-200 responses.
 
-### login
+### login (done)
 - **Purpose**: Authenticates user with username and password.
 - **Method**: POST
-- **Endpoint**: `${BASE_URL}/login2/`
+- **Endpoint**: `/accounts//login2/`
 - **Headers**: 'Content-Type': 'application/json', 'X-CSRFToken'
 - **Body**: JSON containing `{ username, password }`
 - **Success Response**: `{ success: boolean, message: string }`
 - **Error Response**: `{ success: false, message: 'Invalid credentials' }` or other HTTP errors.
 
-### registerUser
+  {
+    "username":"test",
+    "password":"test"
+}
+
+### registerUser (done)
 - **Purpose**: Registers a new user.
 - **Method**: POST
-- **Endpoint**: `${BASE_URL}/register/`
-- **Headers**: 'Content-Type': 'application/json'
+- **Endpoint**: `/accounts/register/`
+- **Headers**: 'Content-Type': 'application/json', 'X-CSRFToken'
 - **Body**: JSON containing `userData`
 - **Note**: Error and success handling based on response status.
 
-### fetchUserData
+{
+  "email": "hadiwdidi@gmail.com",
+  "username": "string",
+  "name": "string",
+  "phone": "string",
+  "profession": "string",
+  "password": "string"
+}
+
+### fetchUserData (done)
 - **Purpose**: Fetches user profile data.
 - **Method**: GET
-- **Endpoint**: `${BASE_URL}/profile/`
+- **Endpoint**: `/accounts/profile/`
 - **Headers**: 'X-CSRFToken', 'Authorization' (Bearer token)
 - **Body**: None
 - **Note**: Error handling for non-200 responses.
 
-### changePassword
+### changePassword (done)
 - **Purpose**: Changes the user's password.
 - **Method**: POST
-- **Endpoint**: `${BASE_URL}/change-password/`
+- **Endpoint**: `/accounts/change-password/`
 - **Headers**: 'Content-Type': 'application/json', 'X-CSRFToken', 'Authorization' (Bearer token)
 - **Body**: JSON containing `{ current_password, new_password }`
 - **Success/Error Response**: Based on response status.
+
+  {
+  "current_password": "test",
+  "new_password": "test"
+}
 
 ### verifyOTP
 - **Purpose**: Verifies OTP during registration.
@@ -211,43 +241,53 @@
 - **Body**: JSON containing `{ otp }`
 - **Note**: Error and success handling as per response.
 
-### logoutUser
+### logoutUser (done)
 - **Purpose**: Logs out the user.
 - **Method**: POST
-- **Endpoint**: `${BASE_URL}/logout/`
+- **Endpoint**: `/accounts/logout/`
 - **Headers**: 'Content-Type': 'text/html; charset=utf-8', 'X-CSRFToken'
 - **Body**: None
-- **Note**: Response handling based on status code.
+- **Note**: success code 200 
 
-### changeEmail
+### changeEmail (done)
 - **Purpose**: Changes the user's email.
 - **Method**: POST
-- **Endpoint**: `${BASE_URL}/change-email/`
+- **Endpoint**: `/accounts/change-email/`
 - **Headers**: 'Content-Type': 'application/json', 'X-CSRFToken', 'Authorization' (Bearer token)
 - **Body**: JSON containing `{ new_Email: newEmail }`
-- **Success/Error Response**: Based on response status.
+- **Success/Error Response**: Based on response status. 200 success
 
-### changeProfession
+{
+  "new_Email": "hamzehm2003@gmail.com"
+}
+
+### changeProfession (done)
 - **Purpose**: Changes the user's profession.
 - **Method**: POST
-- **Endpoint**: `${BASE_URL}/change-profession/`
+- **Endpoint**: `/accounts/change-profession/`
 - **Headers**: 'Content-Type': 'application/json', 'X-CSRFToken', 'Authorization' (Bearer token)
 - **Body**: JSON containing `{ new_Profession: newProfession }`
 - **Success/Error Response**: Based on response status.
 
-### changePhone
+
+{
+  "new_Profession": "test"
+}
+  
+
+### changePhone (done)
 - **Purpose**: Changes the user's phone number.
 - **Method**: POST
-- **Endpoint**: `${BASE_URL}/change-phone/`
+- **Endpoint**: `/accounts/change-phone/`
 - **Headers**: 'Content-Type': 'application/json', 'X-CSRFToken', 'Authorization' (Bearer token)
 - **Body**: JSON containing `{ new_Phone: newPhone }`
 - **Success/Error Response**: Based on response status.
 
-### resetPassword
+### resetPassword (done)
 - **Purpose**: Initiates password reset process.
 - **Method**: POST
-- **Endpoint**: `${BASE_URL}/password/reset/`
+- **Endpoint**: `/accounts/password/reset/`
 - **Headers**: 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken'
-- **Body**: Form data containing `{ email }`
+- **Body**: Form data containing `{ email }`, "email" is the key name and the value is the email address
 - **Success/Error Response**: Based on response data or error message.
 
