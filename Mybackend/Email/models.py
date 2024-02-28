@@ -10,6 +10,7 @@ class Email(models.Model):
     ReceivedDate = models.DateTimeField()  # Date and time when the email was received
     IsPriority = models.IntegerField(default=0)  # Integer field to indicate the priority level of the email
     isDeleted = models.BooleanField(default=False)
+    isOpen = models.BooleanField(default=False)
     Body = models.TextField()  # Adding a new field for email body
     def __str__(self):
         return f"{self.Subject} (Email ID {self.EmailID})"

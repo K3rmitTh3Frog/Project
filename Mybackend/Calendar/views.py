@@ -321,3 +321,30 @@ class CreateCalendarDurationCheckView(generics.CreateAPIView):
                 raise serializers.ValidationError("You cannot arrive on time to this event based on your last event schedule.")
 
         serializer.save(UserID=user)
+
+from django.utils import timezone
+
+class TodaysEventsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        current_date = timezone.localtime(timezone.now()).date()
+        current_time = timezone.localtime(timezone.now()).time()
+        
+        # Filter events for today
+        todays_events = Event.objects.filter(
+            UserID=user, 
+            StartDate=current_date
+        )
+
+        # Count events that have not started yet
+        future_events_count = todays_events.filter(StartTime__gt=current_time).count()
+
+        # Count events that have already started
+        past_events_count = todays_events.filter(StartTime__lte=current_time).count()
+
+        return Response({
+            "past_events_today": past_events_count,
+            "future_events_today": future_events_count
+        })

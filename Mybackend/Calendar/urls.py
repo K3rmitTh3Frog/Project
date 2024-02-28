@@ -18,6 +18,7 @@ urlpatterns = [
     path('duration/', views.duration_view, name='duration'),
     path('event-duration/<int:event_id1>/<int:event_id2>/', EventDurationCheckView.as_view(), name='event-duration-check'),
     path('create_check/', CreateCalendarDurationCheckView.as_view(), name='create an event with duration check'),
+    path('status-events-today/', TodaysEventsView.as_view(), name='remaining-events-today'),
 ]
 
 

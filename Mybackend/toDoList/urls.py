@@ -15,4 +15,5 @@ urlpatterns = [
     path('<int:todo_id>/change-status/', ChangeStatusView.as_view(), name='change-status'),
     path('delete/<int:todo_id>/', DeleteToDoListView.as_view(), name='delete-todolist'),
     path('mark/<int:todo_id>/', MarkToDoListView.as_view(), name='mark-todolist'),
+    path('status-todos-count/', ToDoListStatusCountsView.as_view(), name='incomplete-todos-count'),
 ]

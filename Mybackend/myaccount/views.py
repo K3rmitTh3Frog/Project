@@ -40,8 +40,22 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
+
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.response import Response
+
+
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import AnonymousUser
+
 class UserRegistrationView(generics.CreateAPIView):
+    
     serializer_class = UserRegistrationSerializer
+
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -86,9 +100,10 @@ class OTPVerificationView(generics.GenericAPIView):
         return Response({'message': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserProfileView(APIView):
-    # Uncomment this if you want to restrict this view to authenticated users only
+    
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(operation_summary="profile")
     def get(self, request):
         if isinstance(request.user, AnonymousUser):
             return Response({'error': 'User is not authenticated'}, status=401)

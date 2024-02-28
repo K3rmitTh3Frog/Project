@@ -26,6 +26,7 @@ class PriorityEmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = PriorityEmail
         fields = '__all__'  # This will include all fields of the PriorityEmail model
+        ref_name = 'EmailChangePriority' 
 
 class CreatePriorityEmailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,6 +46,7 @@ class ChangePrioritySerializer(serializers.Serializer):
 
     class Meta:
         fields = ['new_IsPriority']
+        ref_name = 'ToDoListChangePriority'  
 
     def update(self, instance, validated_data):
         instance.IsPriority = validated_data.get('new_IsPriority', instance.IsPriority)

@@ -224,7 +224,7 @@ class DeleteToDoListView(APIView):
     
 class MarkToDoListView(APIView):
     permission_classes = [IsAuthenticated]
-
+    
     def patch(self, request, todo_id):
         user = self.request.user
         try:
@@ -237,3 +237,31 @@ class MarkToDoListView(APIView):
         todo_item.save()
 
         return Response({"success": "ToDoList item marked successfully"}, status=status.HTTP_200_OK)
+
+from django.utils import timezone
+
+class ToDoListStatusCountsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Get current date
+        current_date = timezone.now().date()
+
+        # Base query for ToDoList items due today and belonging to the user
+        base_query = ToDoList.objects.filter(
+            Due__date=current_date, 
+            UserID=request.user
+        )
+
+        # Count for each status
+        complete_count = base_query.filter(Status='Complete').count()
+        in_progress_count = base_query.filter(Status='In Progress').count()
+        not_started_count = base_query.filter(Status='Not Started').count()
+
+        # Return the counts
+        return Response({
+            "complete_count": complete_count,
+            "in_progress_count": in_progress_count,
+            "not_started_count": not_started_count,
+            "total":complete_count+in_progress_count+not_started_count
+        })

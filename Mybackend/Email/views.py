@@ -225,6 +225,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from rest_framework.permissions import IsAuthenticated
 from .models import CustomUser, Email, PriorityEmail
+import json
 class ListEmailsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -300,3 +301,214 @@ class ListEmailsView(APIView):
 
         return HttpResponse("Emails fetched and stored successfully.")
     
+
+class PriorityEmailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, priority):
+        user = request.user
+        emails = Email.objects.filter(UserID=user, IsPriority=priority)
+        serializer = EmailSerializer(emails, many=True)
+        return Response(serializer.data)
+    
+
+from django.utils import timezone
+class TodaysEmailsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        today = timezone.localtime(timezone.now()).date()
+
+        # Filter emails for today
+        todays_emails = Email.objects.filter(
+            UserID=user, 
+            ReceivedDate__date=today, 
+            isDeleted=False
+        )
+
+        # Count unopened and opened emails
+        unopened_emails_count = todays_emails.filter(isOpen=False).count()
+        opened_emails_count = todays_emails.filter(isOpen=True).count()
+
+        return Response({
+            "unopened_emails_today": unopened_emails_count,
+            "opened_emails_today": opened_emails_count,
+            'total':unopened_emails_count+opened_emails_count
+        })
+    
+class OpenEmailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, email_id):
+        user = request.user
+        try:
+            email = Email.objects.get(EmailID=email_id, UserID=user)
+
+            # Update isOpen to True
+            email.isOpen = True
+            email.save()
+
+            return Response({"success": "Email marked as opened"}, status=status.HTTP_200_OK)
+        except Email.DoesNotExist:
+            return Response({"error": "Email not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+from openai import OpenAI
+import time
+
+# Initialize the OpenAI client with your API key
+client = OpenAI(api_key="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")  # Replace YOUR_API_KEY_HERE with your actual API key
+
+assistant_id = "asst_S508t24Tz9JLYmIs5TrnP7m4"  # The ID of your Assistant
+
+def submit_message(assistant_id, thread_id, user_message):
+    """
+    Submit a message to the assistant and start a new Run.
+    """
+    # Create a message in the thread
+    client.beta.threads.messages.create(
+        thread_id=thread_id, role="user", content=user_message
+    )
+    # Start a new run with the assistant
+    return client.beta.threads.runs.create(
+        thread_id=thread_id,
+        assistant_id=assistant_id,
+    )
+
+def get_response(thread_id):
+    """
+    Get the list of messages in a thread.
+    """
+    return client.beta.threads.messages.list(thread_id=thread_id, order="asc")
+
+def create_thread_and_run(user_input):
+    """
+    Create a new thread and submit the user input to it.
+    """
+    # Create a new thread
+    thread = client.beta.threads.create()
+    # Submit the user message and start a new run
+    run = submit_message(assistant_id, thread.id, user_input)
+    return thread, run
+
+def wait_on_run(run, thread):
+    """
+    Wait for a run to complete and then get the response.
+    """
+    while run.status == "queued" or run.status == "in_progress":
+        run = client.beta.threads.runs.retrieve(
+            thread_id=thread.id,
+            run_id=run.id,
+        )
+        time.sleep(0.1)
+    return run
+def pretty_print(messages):
+    """
+    Pretty print the messages from a thread, correctly accessing message attributes.
+    """
+    print("# Messages")
+    for m in messages:
+        # Check if there is content and it's a non-empty list
+        if m.content and len(m.content) > 0:
+            # Access the 'text' attribute of the first item in the 'content' list, then 'value'
+            message_text = m.content[0].text.value
+        else:
+            message_text = "No content found"
+        
+        print(f"{m.role}: {message_text}")
+    print()
+
+
+# Input for testing
+
+from toDoList.models import ToDoList
+from datetime import datetime
+
+from django.http import JsonResponse
+from datetime import timedelta
+
+class AIAssistantView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Extract email content from the URL query string
+        email_content = request.GET.get('email_content', None)
+        received_date = request.GET.get('received_date', None)
+        if not email_content:
+            return JsonResponse({"error": "Email content parameter is missing"}, status=status.HTTP_400_BAD_REQUEST)
+        if not received_date:
+            return JsonResponse({"error": "received_date parameter is missing"}, status=status.HTTP_400_BAD_REQUEST)
+        m = email_content+'date recieved'+received_date
+        # Create a thread and run with the given input
+        thread, run = create_thread_and_run(m)
+
+        # Wait for the run to complete
+        run = wait_on_run(run, thread)
+
+        # Retrieve the messages
+        messages = get_response(thread.id)
+
+        # Prepare the response data
+        response_data = {
+            "messages": [{
+                "role": m.role,
+                "content": m.content[0].text.value if m.content and len(m.content) > 0 else "No content found"
+            } for m in messages]
+        }
+
+        messages = response_data["messages"]
+
+        # Process and save tasks before returning response
+        
+        for message in messages:
+            if message["role"] == "assistant" and "Priority" in message["content"]:
+               self.save_task_from_message(message["content"], request.user)
+
+        # Prepare the original response data
+        final_response_data = {
+            "messages": [{
+                "role": m["role"],
+                "content": m["content"]
+            } for m in messages]
+        }
+
+        return JsonResponse(final_response_data)
+
+    def save_task_from_message(self, message_content, user):
+        task_details = {}
+        lines = message_content.split(',')
+        for line in lines:
+            parts = line.split(':', 1)
+            if len(parts) == 2:
+                key, value = parts
+                task_details[key.strip()] = value.strip()
+
+        due_date_str = task_details.get("Due Date", None)
+        due_date = datetime.strptime(due_date_str, "%d/%m/%y") if due_date_str else None
+
+        # Convert Time_Estimate string to timedelta
+        time_estimate_str = task_details.get("Time Estimate", "dd")
+        time_estimate = self.parse_time_estimate(time_estimate_str)
+        ToDoList.objects.create(
+            UserID=user,
+            Priority=self.get_priority(task_details.get("Priority")),
+            Due=due_date,
+            Description=task_details.get("Description"),
+            Category=task_details.get("Category"),
+            
+            Time_Estimate=time_estimate,  # Use the converted timedelta object
+            Reminders=None,  # Assuming 'null' as default, adapt if needed
+            Status=task_details.get("Status", "Not Started")
+        )
+
+    def get_priority(self, priority_str):
+        priority_map = {"High": 10, "Medium": 5, "Low": 1}
+        return priority_map.get(priority_str, 1)
+
+    def parse_time_estimate(self, time_estimate_str):
+        if time_estimate_str:
+            hours, minutes = map(int, time_estimate_str.split(':'))
+            return timedelta(hours=hours, minutes=minutes)
+        return timedelta()  # Return zero timedelta if no time estimate

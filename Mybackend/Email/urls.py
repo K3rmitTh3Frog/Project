@@ -15,6 +15,10 @@ urlpatterns = [
     path('change-priority/<int:email_id>/', ChangeEmailPriorityView.as_view(), name='change-email-priority'),
     path('list-emails/', ListEmailsView.as_view(), name='list-emails'),
     path('delete-all/', DeleteAllEmailsView.as_view(), name='list-emails'),
+    path('view-priority/<int:priority>/', PriorityEmailView.as_view(), name='view-priority-email'),
+    path('status-todays-emails/', TodaysEmailsView.as_view(), name='todays-unopened-emails'),
+    path('open/<int:email_id>/', OpenEmailView.as_view(), name='open-email'),
+    path('ai_assistant/', AIAssistantView.as_view(), name='ai_assistant'),
 ]
 
 
