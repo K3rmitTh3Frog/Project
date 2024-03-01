@@ -16,4 +16,7 @@ urlpatterns = [
     path('login2/', CustomLoginView.as_view(), name='login test'),
     path('gmail_authenticate/', GmailAuthenticator.as_view(), name='gmail_authenticate'),
     path('callback/', OAuth2CallbackView.as_view(), name='oauth2callback'),
+    
+    path('auth/microsoft/', microsoft_auth, name='microsoft_auth'),
+    path('auth/callback/microsoft/', microsoft_auth, name='microsoft_callback'),
 ]

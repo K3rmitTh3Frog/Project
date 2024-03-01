@@ -48,6 +48,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     profession = models.CharField(max_length=255)
     is_staff = models.BooleanField(default=False)  # Add is_staff field
     gmail_credentials = models.TextField(null=True, blank=True)
+    Microsoft_credentials = models.TextField(null=True, blank=True)
     #notifications
     notify_for_event_reminder = models.BooleanField(default=True)
     notify_for_ToDoList_reminder = models.BooleanField(default=True)

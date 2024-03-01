@@ -19,6 +19,13 @@ urlpatterns = [
     path('status-todays-emails/', TodaysEmailsView.as_view(), name='todays-unopened-emails'),
     path('open/<int:email_id>/', OpenEmailView.as_view(), name='open-email'),
     path('ai_assistant/', AIAssistantView.as_view(), name='ai_assistant'),
+
+    path('fetch-Microsoft-emails/', FetchEmails.as_view(), name='fetch-Microsoft-emails'),
+    
+
+ 
+    
 ]
+
 
 

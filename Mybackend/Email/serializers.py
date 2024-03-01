@@ -52,3 +52,9 @@ class ChangePrioritySerializer(serializers.Serializer):
         instance.IsPriority = validated_data.get('new_IsPriority', instance.IsPriority)
         instance.save()
         return instance
+
+class EmailFetchSerializer(serializers.Serializer):
+    email_address = serializers.EmailField()
+    password = serializers.CharField(style={'input_type': 'password'})
+    imap_server = serializers.CharField(default='outlook.office365.com')
+

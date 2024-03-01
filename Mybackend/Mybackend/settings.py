@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'allauth.account',  # Keep this line as it is.
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.microsoft',
     'myaccount',
     'django_otp.plugins.otp_totp',
     #
@@ -125,6 +126,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -183,6 +188,12 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': 'c1ab8b1c7ca6e13ddac4',
             'secret': 'd6306996917638b9833d35ab2d30cc29b7bf1252',
             'key': ''
+        }
+    },
+    'microsoft': {
+        'SCOPE': ['User.Read', 'Mail.Read'],
+        'AUTH_PARAMS': {
+            'prompt': 'consent',
         }
     }
 }

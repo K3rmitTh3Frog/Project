@@ -285,6 +285,50 @@ class OAuth2CallbackView(APIView):
         return Response({"success": message}, status=status.HTTP_200_OK)
     
 
+from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.contrib.auth import get_user_model
+import requests
 
+def microsoft_auth(request):
+    client_id = 'f167588e-779c-4604-894e-dc7afafd0955'
+    client_secret = 'mt-8Q~HB2OUd-xuClLA9jwlaBcozx-5MvkZDwbDz'  
+    redirect_uri = 'http://localhost:8000/accounts/auth/callback/microsoft/'
+    scope = 'https://graph.microsoft.com/Mail.Read'  
 
-    
+    if request.method == "GET" and 'code' not in request.GET:
+        # Redirect user to Microsoft login
+        authorization_url = f'https://login.microsoftonline.com/common/oauth2/v2.0/authorize'
+        params = {
+            'client_id': client_id,
+            'response_type': 'code',
+            'redirect_uri': redirect_uri,
+            'scope': scope
+        }
+        auth_url = requests.Request('GET', authorization_url, params=params).prepare().url
+        return redirect(auth_url)
+    elif request.method == "GET" and 'code' in request.GET:
+        # Exchange code for token
+        code = request.GET['code']
+        token_url = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
+        data = {
+            'grant_type': 'authorization_code',
+            'client_id': client_id,
+            'redirect_uri': redirect_uri,
+            'client_secret': client_secret,
+            'code': code,
+            'scope': scope
+        }
+        response = requests.post(token_url, data=data)
+        response_data = response.json()
+        
+        if 'access_token' in response_data:
+            access_token = response_data['access_token']
+            user = request.user
+            user.Microsoft_credentials = access_token 
+            user.save()
+            return HttpResponse("Microsoft account linked successfully.")
+        else:
+            return HttpResponse("Failed to link Microsoft account.")
+    else:
+        return HttpResponse("Invalid request")

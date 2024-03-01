@@ -6,7 +6,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'username', 'email', 'phone', 'profession')
+        fields = ('id', 'name', 'username', 'email', 'phone', 'profession','gmail_credentials')
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
 
@@ -39,7 +39,7 @@ class UserchangePasswordSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'username', 'name', 'phone', 'profession','password')
+        fields = '__all__'
 
 class logoutSerializer(serializers.ModelSerializer):
     class Meta:

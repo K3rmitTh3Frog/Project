@@ -54,6 +54,13 @@ from django.http import JsonResponse
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+# views.py
+import requests
+from bs4 import BeautifulSoup
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
 
 class EmailView(generics.ListAPIView):
     serializer_class = EmailSerializer
@@ -240,7 +247,6 @@ class ListEmailsView(APIView):
 
         service = build('gmail', 'v1', credentials=creds)
 
-        # Retrieve priority email addresses for the user and convert them to lowercase
         priority_emails = [email.lower() for email in PriorityEmail.objects.filter(UserID=user).values_list('EmailAddress', flat=True)]
 
         try:
@@ -512,3 +518,78 @@ class AIAssistantView(APIView):
             hours, minutes = map(int, time_estimate_str.split(':'))
             return timedelta(hours=hours, minutes=minutes)
         return timedelta()  # Return zero timedelta if no time estimate
+    
+
+
+from datetime import datetime
+from django.utils.dateparse import parse_datetime
+from bs4 import BeautifulSoup
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Email, PriorityEmail
+from django.core.exceptions import ObjectDoesNotExist
+
+
+
+class FetchEmails(APIView):
+    def get(self, request):
+        user = request.user
+        if not user.Microsoft_credentials:
+            return Response({"error": "microsoft not linked"}, status=status.HTTP_400_BAD_REQUEST)
+        token = user.Microsoft_credentials
+        url = 'https://graph.microsoft.com/v1.0/me/messages?$top=300'
+        headers = {'Authorization': 'Bearer ' + token}
+
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            emails = response.json().get('value', [])
+
+            for email in emails:
+                subject = email.get('subject', 'No Subject')
+                sender_name = email['sender']['emailAddress'].get('name', 'No Name')
+                sender_address = email['sender']['emailAddress'].get('address', 'No Address')
+                date = parse_datetime(email.get('sentDateTime', ''))
+                body_html = email['body'].get('content', '')
+
+                # Extract text from HTML body
+                soup = BeautifulSoup(body_html, 'html.parser')
+                body_text = soup.get_text()
+
+                try:
+                    # Check if email already exists
+                    existing_email = Email.objects.get(
+                        Subject=subject,
+                        Sender=sender_address,
+                        ReceivedDate=date,
+                        UserID=user
+                    )
+                    # If email already exists, continue to the next email
+                    continue
+                except ObjectDoesNotExist:
+                    pass
+
+                # Priority check
+                priority_emails = PriorityEmail.objects.filter(UserID=user).values_list('EmailAddress', flat=True)
+                is_priority = 10 if sender_address.lower() in priority_emails else 0
+
+                # Create Email object and save to database
+                new_email = Email.objects.create(
+                    UserID=user,
+                    Sender=sender_address,
+                    Reciever=user.name,  # fix this
+                    Subject=subject,
+                    Body=body_text.strip(),
+                    ReceivedDate=date,
+                    IsPriority=is_priority
+                )
+
+            return Response({"message": "Emails fetched and stored successfully."}, status=status.HTTP_200_OK)
+
+        except requests.exceptions.RequestException as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except KeyError as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
