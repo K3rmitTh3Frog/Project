@@ -290,4 +290,368 @@
 - **Headers**: 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken'
 - **Body**: Form data containing `{ email }`, "email" is the key name and the value is the email address
 - **Success/Error Response**: Based on response data or error message.
+- 
 
+
+......................................calendar.............................................
+
+### listAllEvents
+- **Method**: GET
+- **Endpoint**: `/calendar/view/`
+- **Headers**: 
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+- **Success Response**:
+  - **Status Code**: 200 OK
+  - **Content**: List of calendar events in JSON format.
+- **Error Response**:
+  - **Status Code**: 401 Unauthorized
+    - **Content**: `"detail": "Authentication credentials were not provided."`
+
+### createEvent
+- **Method**: POST
+- **Endpoint**: `/calendar/create/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+- **Body**: JSON data containing details of the new event.
+- **Success Response**:
+  - **Status Code**: 201 Created
+- **Error Responses**:
+  - **Status Code**: 400 Bad Request
+    - **Content**: `"error": (error detail)`
+  - **Status Code**: 401 Unauthorized
+    - **Content**: `"detail": "Authentication credentials were not provided."`
+
+
+### SpecificEventView
+- **Purpose**: Retrieves details of a specific event.
+- **Method**: GET
+- **Endpoint**: `/calendar/<int:Event_id>/`
+- **Headers**: 
+  - `'Authorization': 'Bearer token'`
+  - `'X-CSRFToken': CSRF token value`
+- **URL Parameters**: 
+  - `Event_id`: The unique identifier of the event to retrieve details for.
+- **Query Parameters**: None
+- **Success Response**:
+  - **Code**: 200 OK
+  - **Description**: Details of the requested event.
+- **Error Response**:
+  - **Code**: 401 Unauthorized
+    - **Description**: Returned if the user is not authenticated or does not have permission to access the resource.
+  - **Code**: 404 Not Found
+    - **Description**: Returned if the specified event does not exist or is not associated with the authenticated user.
+- **Request Body**: None
+
+
+### calendar/deleteEvent
+
+- **Method**: DELETE
+- **Endpoint**: `/calendar/delete/{Event_id}/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+#### Success Response:
+- **Status Code**: 200
+  - **Content**: {"success": "Event item deleted successfully"}
+
+#### Error Responses:
+- **Status Code**: 404 Not Found
+  - **Content**: {"error": "Event item not found"}
+- **Status Code**: 401 Unauthorized
+  - **Content**: {"detail": "Authentication credentials were not provided."}
+
+
+
+### calendar/changeTitle
+
+- **Method**: POST
+- **Endpoint**: `/calendar/changeTitle/{event_id}/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+- **Body**: JSON data containing the new title.
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: {"success": "Title updated successfully"}
+
+#### Error Responses:
+- **Status Code**: 404 Not Found
+  - **Content**: {"error": "Event item not found"}
+- **Status Code**: 401 Unauthorized
+  - **Content**: {"detail": "Authentication credentials were not provided."}
+- **Status Code**: 400 Bad Request
+  - **Content**: {"error": (error detail)}
+ 
+
+### calendar/changeEventDescription
+
+- **Method**: POST
+- **Endpoint**: `/calendar/changeEventDescription/{event_id}/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+- **Body**: JSON data containing the new description.
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: {"success": "Event description updated successfully"}
+
+#### Error Responses:
+- **Status Code**: 404 Not Found
+  - **Content**: {"error": "Event item not found"}
+- **Status Code**: 401 Unauthorized
+  - **Content**: {"detail": "Authentication credentials were not provided."}
+- **Status Code**: 400 Bad Request
+  - **Content**: {"error": (error detail)}
+ 
+
+### calendar/changeStartDate
+
+- **Method**: POST
+- **Endpoint**: `/calendar/changeStartDate/{event_id}/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+- **Body**: JSON data containing the new start date.
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: {"success": "Start date updated successfully"}
+
+#### Error Responses:
+- **Status Code**: 404 Not Found
+  - **Content**: {"error": "Event item not found"}
+- **Status Code**: 401 Unauthorized
+  - **Content**: {"detail": "Authentication credentials were not provided."}
+- **Status Code**: 400 Bad Request
+  - **Content**: {"error": (error detail)}
+
+
+### calendar/changeStartTime
+
+- **Method**: POST
+- **Endpoint**: `/calendar/changeStartTime/{event_id}/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+- **Body**: JSON data containing the new start time.
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: {"success": "Start time updated successfully"}
+
+#### Error Responses:
+- **Status Code**: 404 Not Found
+  - **Content**: {"error": "Event item not found"}
+- **Status Code**: 401 Unauthorized
+  - **Content**: {"detail": "Authentication credentials were not provided."}
+- **Status Code**: 400 Bad Request
+  - **Content**: {"error": (error detail)}
+  - 
+
+
+### calendar/changeEndDate
+
+- **Method**: POST
+- **Endpoint**: `/calendar/changeEndDate/{event_id}/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+- **Body**: JSON data containing the new end date.
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: {"success": "End date updated successfully"}
+
+#### Error Responses:
+- **Status Code**: 404 Not Found
+  - **Content**: {"error": "Event item not found"}
+- **Status Code**: 401 Unauthorized
+  - **Content**: {"detail": "Authentication credentials were not provided."}
+- **Status Code**: 400 Bad Request
+  - **Content**: {"error": (error detail)}
+ 
+
+### calendar/changeEndTime
+
+- **Method**: POST
+- **Endpoint**: `/calendar/changeEndTime/{event_id}/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+- **Body**: JSON data containing the new end time.
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: {"success": "End time updated successfully"}
+
+#### Error Responses:
+- **Status Code**: 404 Not Found
+  - **Content**: {"error": "Event item not found"}
+- **Status Code**: 401 Unauthorized
+  - **Content**: {"detail": "Authentication credentials were not provided."}
+- **Status Code**: 400 Bad Request
+  - **Content**: {"error": (error detail)}
+ 
+
+### calendar/eventDurationCheck
+
+- **Method**: GET
+- **Endpoint**: `/calendar/event-duration/{event_id1}/{event_id2}/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: Duration between two events.
+
+#### Error Responses:
+- **Status Code**: 404 Not Found
+  - **Content**: {"error": "One or both events not found"}
+- **Status Code**: 401 Unauthorized
+  - **Content**: {"detail": "Authentication credentials were not provided."}
+- **Status Code**: 400 Bad Request
+  - **Content**: {"error": "One or both events have no destination"}
+ 
+### calendar/directions
+
+- **Method**: GET
+- **Endpoint**: `/calendar/directions/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+- **Query Parameters**:
+  - `origin`: The starting point of the directions.
+  - `destination`: The destination point of the directions.
+  - `mode`: The mode of transportation (e.g., "driving", "walking", "transit").
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: Directions between the origin and destination.
+
+#### Error Responses:
+- **Status Code**: 400 Bad Request
+  - **Content**: {"error": "Missing parameters"}
+ - **Status Code**: 500 Internal Server Error
+  - **Content**: {"error": "Error message"}
+ 
+
+  ### calendar/duration
+
+- **Method**: GET
+- **Endpoint**: `/calendar/duration/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+- **Query Parameters**:
+  - `origin`: The starting point.
+  - `destination`: The destination point.
+  - `mode`: The mode of transportation (e.g., "driving", "walking", "transit").
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: Duration information between origin and destination.
+
+#### Error Responses:
+- **Status Code**: 400 Bad Request
+  - **Content**: {"error": "Missing parameters"}
+- **Status Code**: 500 Internal Server Error
+  - **Content**: {"error": "Error message"}
+ 
+### calendar/createCalendarDurationCheck
+
+- **Method**: POST
+- **Endpoint**: `/calendar/create_check/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+#### Success Response:
+- **Status Code**: 201 Created
+  - **Content**: Created event details.
+
+#### Error Responses:
+- **Status Code**: 400 Bad Request
+  - **Content**: {"error": "One or both events have no destination"}
+- **Status Code**: 404 Not Found
+  - **Content**: {"error": "One or both events not found"}
+- **Status Code**: 401 Unauthorized
+  - **Content**: {"detail": "Authentication credentials were not provided."}
+- **Status Code**: 422 Unprocessable Entity
+  - **Content**: Error details if validation fails.
+ 
+
+### calendar/todaysEvents
+
+- **Method**: GET
+- **Endpoint**: `/calendar/todaysEvents/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: 
+    ```json
+    {
+        "past_events_today": (count of past events),
+        "future_events_today": (count of future events)
+    }
+    ```
+
+#### Error Responses:
+- **Status Code**: 500 Internal Server Error
+  - **Content**: {"error": (error message)}
+ 
+
+### calendar/todaysEvents
+
+- **Method**: GET
+- **Endpoint**: `/calendar/todaysEvents/`
+- **Headers**:
+  - 'Content-Type': 'application/json'
+  - 'X-CSRFToken': (CSRF token value)
+  - 'Authorization': 'Bearer (token)'
+
+#### Success Response:
+- **Status Code**: 200 OK
+  - **Content**: 
+    ```json
+    {
+        "past_events_today": (count of past events),
+        "future_events_today": (count of future events)
+    }
+    ```
+
+#### Error Responses:
+- **Status Code**: 401 Unauthorized
+  - **Content**: {"detail": "Authentication credentials were not provided."}
+- **Status Code**: 500 Internal Server Error
+  - **Content**: {"error": (error message)}
