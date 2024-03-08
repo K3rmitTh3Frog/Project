@@ -360,13 +360,11 @@ class OpenEmailView(APIView):
             return Response({"error": "Email not found"}, status=status.HTTP_404_NOT_FOUND)
         
 
-
 from openai import OpenAI
 import time
 
 # Initialize the OpenAI client with your API key
 client = OpenAI(api_key="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")  # Replace YOUR_API_KEY_HERE with your actual API key
-
 assistant_id = "asst_S508t24Tz9JLYmIs5TrnP7m4"  # The ID of your Assistant
 
 def submit_message(assistant_id, thread_id, user_message):
@@ -426,7 +424,6 @@ def pretty_print(messages):
         print(f"{m.role}: {message_text}")
     print()
 
-
 # Input for testing
 
 from toDoList.models import ToDoList
@@ -434,6 +431,7 @@ from datetime import datetime
 
 from django.http import JsonResponse
 from datetime import timedelta
+
 
 class AIAssistantView(APIView):
     permission_classes = [IsAuthenticated]
@@ -584,12 +582,117 @@ class FetchEmails(APIView):
                     ReceivedDate=date,
                     IsPriority=is_priority
                 )
-
             return Response({"message": "Emails fetched and stored successfully."}, status=status.HTTP_200_OK)
-
         except requests.exceptions.RequestException as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except KeyError as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from openai import OpenAI
+
+client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
+
+prompts = [
+    "You are a highly efficient assistant. From the following email, extract any tasks mentioned, including their priority inferred from urgency. Notes field in the output should include the sender's email address the date received if giving. Estimate the time needed based on details provided and assume a time estimation for tasks where the estimation time is not explicitly provided. Format the output with: Priority (High, Medium, Low), Due Date (in date format DD/MM/YY), Description, Category, Notes, Time Estimate (you have to estimate), Reminders (set to null by default), and set Status as 'Not Started'. if there is no tasks please return 'No task'. Time Estimate should be like 1:30, no hour, etc mention.",
+    "example of an output: Priority: Medium, Due Date: 21/02/24, Description: Follow up on the Marketing Coordinator position application at Bright Horizon Solutions, Notes: sender: hamzehhirzalla@outlook.com and received date: 1/11/2003, Time Estimate: 0:30, Reminders: null, Status: Not Started, Category: follow Up",
+]
+
+class chat_with_AI(APIView):
+    serializer_class = MessageSerializer
+    
+    def post(self, request): 
+        serializer = MessageSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+        
+        body = serializer.validated_data["emailBody"]
+        received_date = serializer.validated_data["recievedDate"]
+        senderEmail = serializer.validated_data["senderEmail"]
+        received_date_str = received_date.strftime('%Y-%m-%d') if received_date else ""
+        messages = 'Email ' + body + ' received date ' + received_date_str + ' sender email: '+senderEmail
+        print(messages)
+        if not messages:
+            response_data = {"message": "Messages can't be empty!"}
+            return Response(response_data, status=400)
+
+        completion = client.chat.completions.create(
+            model="local-model",  
+            messages=[
+                {"role": "system", "content": ". ".join(prompts)},
+                {"role": "user", "content": ". ".join(messages)},
+            ],
+            temperature=0.7,
+        )
+        response_data = {completion.choices[0].message.content}
+        response_data = {"content": completion.choices[0].message.content}
+
+        print("Response Data Content:", response_data["content"])
+        if response_data["content"] != 'No task':
+            self.save_task_from_message(response_data["content"], request.user)  # add to-do list
+
+
+        return Response(response_data, status=200)
+    
+
+    def save_task_from_message(self, message_content, user):
+        task_details = {}
+        lines = message_content.split(',')
+        for line in lines:
+            parts = line.split(':', 1)
+            if len(parts) == 2:
+                key, value = parts
+                task_details[key.strip()] = value.strip()
+
+        print("Task Details:", task_details)  # Debug print
+
+        due_date_str = task_details.get("Due Date", None)
+        print("Due Date String:", due_date_str)  # Debug print
+
+        if due_date_str:
+            if len(due_date_str.split('/')[-1]) == 2:
+                due_date_format = "%d/%m/%y"
+            else:
+                due_date_format = "%d/%m/%Y"
+
+            print('due_date_format: '+due_date_format)
+            due_date = datetime.strptime(due_date_str, due_date_format)
+        else:
+            due_date = None
+
+        print("Due Date:", due_date)  
+
+        # Convert Time_Estimate string to timedelta
+        time_estimate_str = task_details.get("Time Estimate", "dd")
+        print("Time Estimate String:", time_estimate_str)  # Debug print
+        time_estimate = self.parse_time_estimate(time_estimate_str)
+        print("Time Estimate:", time_estimate)  # Debug print
+
+        ToDoList.objects.create(
+            UserID=user,
+            Priority=self.get_priority(task_details.get("Priority")),
+            Due=due_date,
+            Description=task_details.get("Description"),
+            Category=task_details.get("Category"),
+            Notes=task_details.get("Notes"),
+            Time_Estimate=time_estimate,  
+            Reminders=None,  
+            Status=task_details.get("Status", "Not Started")
+        )
+
+
+
+    def get_priority(self, priority_str):
+        priority_map = {"High": 10, "Medium": 5, "Low": 1}
+        return priority_map.get(priority_str, 1)
+
+    def parse_time_estimate(self, time_estimate_str):
+        if time_estimate_str:
+            hours, minutes = map(int, time_estimate_str.split(':'))
+            return timedelta(hours=hours, minutes=minutes)
+        return timedelta() 

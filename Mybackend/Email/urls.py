@@ -21,7 +21,7 @@ urlpatterns = [
     path('ai_assistant/', AIAssistantView.as_view(), name='ai_assistant'),
 
     path('fetch-Microsoft-emails/', FetchEmails.as_view(), name='fetch-Microsoft-emails'),
-    
+    path('api/chat/', chat_with_AI.as_view(), name='chat_with_AI'),
 
  
     

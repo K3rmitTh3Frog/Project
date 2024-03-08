@@ -58,3 +58,8 @@ class EmailFetchSerializer(serializers.Serializer):
     password = serializers.CharField(style={'input_type': 'password'})
     imap_server = serializers.CharField(default='outlook.office365.com')
 
+
+class MessageSerializer(serializers.Serializer):
+    emailBody = serializers.CharField()
+    recievedDate=serializers.DateField()
+    senderEmail=serializers.CharField()
