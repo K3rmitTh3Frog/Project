@@ -605,7 +605,7 @@ prompts = [
 
 class chat_with_AI(APIView):
     serializer_class = MessageSerializer
-    
+    permission_classes = [IsAuthenticated]
     def post(self, request): 
         serializer = MessageSerializer(data=request.data)
         if not serializer.is_valid():
