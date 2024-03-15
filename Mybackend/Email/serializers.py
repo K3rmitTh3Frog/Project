@@ -63,3 +63,6 @@ class MessageSerializer(serializers.Serializer):
     emailBody = serializers.CharField()
     recievedDate=serializers.DateField()
     senderEmail=serializers.CharField()
+
+class MarkEmailAsReadSerializer(serializers.Serializer):
+    email_id = serializers.CharField()

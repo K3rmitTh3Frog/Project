@@ -12,6 +12,7 @@ class Email(models.Model):
     isDeleted = models.BooleanField(default=False)
     isOpen = models.BooleanField(default=False)
     Body = models.TextField()  # Adding a new field for email body
+    GmailEmailID = models.TextField(max_length=40, null=True)
     def __str__(self):
         return f"{self.Subject} (Email ID {self.EmailID})"
 

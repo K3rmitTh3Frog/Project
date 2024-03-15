@@ -22,6 +22,8 @@ urlpatterns = [
 
     path('fetch-Microsoft-emails/', FetchEmails.as_view(), name='fetch-Microsoft-emails'),
     path('api/chat/', chat_with_AI.as_view(), name='chat_with_AI'),
+    path('mark-Gmail-Email/', MarkEmailAsRead.as_view(), name='mark Gmail Email'),
+
 
  
     

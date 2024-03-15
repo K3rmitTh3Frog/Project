@@ -39,6 +39,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('accounts/', include('allauth.urls')),
     path('email/', include('Email.urls')),
+    path('chatBot/', include('ChatBox.urls')),
 
     path('api_schema/', get_schema_view(), name='api-schema'),
 

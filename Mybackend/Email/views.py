@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -61,6 +60,40 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+import json
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
+
+class MarkEmailAsRead(APIView):
+    serializer_class = MarkEmailAsReadSerializer
+    def post(self, request):
+        serializer = MarkEmailAsReadSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        email_id = serializer.validated_data['email_id']
+        user = request.user
+        if not user.gmail_credentials:
+            return Response({"error": "Gmail not linked"}, status=status.HTTP_400_BAD_REQUEST)
+
+        creds = Credentials.from_authorized_user_info(json.loads(user.gmail_credentials))
+        if creds.expired:
+            creds.refresh(Request())
+
+        # Build the Gmail API service
+        service = build('gmail', 'v1', credentials=creds)
+        try:
+            # Mark the email as read by removing the 'UNREAD' label
+            service.users().messages().modify(
+                userId='me',
+                id=email_id,
+                body={'removeLabelIds': ['UNREAD']}
+            ).execute()
+            return Response({"message": f"Email with ID {email_id} marked as read."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 class EmailView(generics.ListAPIView):
     serializer_class = EmailSerializer
@@ -113,15 +146,38 @@ class SpecificEmailView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, EmailID):
-        user = self.request.user
+        user = request.user
         try:
-            todo_item = Email.objects.get(pk=EmailID, UserID=user)
+            email_item = Email.objects.get(EmailID=EmailID, UserID=user)
         except Email.DoesNotExist:
-            return Response({"error": "Event item not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Email item not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Serialize the todo item
-        serializer = EmailSerializer(todo_item)
+        if email_item.GmailEmailID:
+            self.mark_email_as_read(user, email_item.GmailEmailID)
+            email_item.isOpen=True
+        serializer = EmailSerializer(email_item)
         return Response(serializer.data)
+
+    def mark_email_as_read(self, user, gmail_email_id):
+        if not user.gmail_credentials:
+            return JsonResponse({"error": "Gmail not linked"}, status=status.HTTP_400_BAD_REQUEST)
+
+        creds = Credentials.from_authorized_user_info(json.loads(user.gmail_credentials))
+        if creds.expired:
+            creds.refresh(Request())
+
+        service = build('gmail', 'v1', credentials=creds)
+        try:
+            # Mark the email as read by removing the 'UNREAD' label
+            service.users().messages().modify(
+                userId='me',
+                id=gmail_email_id,
+                body={'removeLabelIds': ['UNREAD']}
+            ).execute()
+        except Exception as e:
+            # Consider logging this error; using JsonResponse for consistency
+            return JsonResponse({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class ChangeEmailPriorityView(generics.GenericAPIView):
     serializer_class = ChangePrioritySerializer
@@ -204,7 +260,7 @@ class DeletePriorityEmailView(APIView):
             return Response({"error": "Priority email not found"}, status=status.HTTP_404_NOT_FOUND)
 
         priority_email.delete()
-        return Response({"success": "Priority email deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"success": "Priority email deleted successfully"}, status=status.HTTP_200_OK)
     
 from django.http import HttpResponse
 from rest_framework.views import APIView
@@ -233,6 +289,7 @@ from datetime import datetime
 from rest_framework.permissions import IsAuthenticated
 from .models import CustomUser, Email, PriorityEmail
 import json
+
 class ListEmailsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -260,6 +317,7 @@ class ListEmailsView(APIView):
                 sender = ""
                 received_date = None
                 snippet = txt.get('snippet', '')
+                isOpen = 'UNREAD' not in txt.get('labelIds', [])  # Check if the email is unread
 
                 for header in txt['payload']['headers']:
                     if header['name'] == 'Subject':
@@ -269,28 +327,32 @@ class ListEmailsView(APIView):
                     elif header['name'] == 'Date':
                         received_date = parse(header['value']).replace(tzinfo=None)
 
-                # Check if the received_date is None and set to current time if it is
                 if not received_date:
                     received_date = datetime.now()
 
-                # Extract email address from sender and convert to lowercase
                 sender_email = sender.split('<')[-1].split('>')[0].lower()
-
-                # Check if the sender's email is a priority email
                 is_priority = 10 if sender_email in priority_emails else 0
 
-                # Check for duplicates before saving
-                if not Email.objects.filter(
+                # Fetch the email ID from the message data
+                email_id = msg['id']
+
+                # Query to find the existing email
+                existing_email = Email.objects.filter(
                     Sender=sender,
                     Reciever=user.email,
                     Subject=subject,
                     ReceivedDate=received_date,
                     UserID=user
-                ).exists():
-                    # Extract the email body
-                    email_body = BeautifulSoup(snippet, 'html.parser').get_text(separator='\n')
+                ).first()
 
-                    # Create a new Email instance and save it
+                if existing_email:
+                    # If the email exists and isOpen needs to be updated
+                    if existing_email.isOpen != isOpen:
+                        existing_email.isOpen = isOpen
+                        existing_email.GmailEmailID = email_id  # Update GmailEmailID field with the fetched email ID
+                        existing_email.save()
+                else:
+                    email_body = BeautifulSoup(snippet, 'html.parser').get_text(separator='\n')
                     new_email = Email(
                         UserID=user,
                         Sender=sender,
@@ -298,7 +360,9 @@ class ListEmailsView(APIView):
                         Subject=subject,
                         Body=email_body,
                         ReceivedDate=received_date,
-                        IsPriority=is_priority,  # Set priority
+                        IsPriority=is_priority,
+                        isOpen=isOpen,
+                        GmailEmailID=email_id  # Save the fetched email ID to GmailEmailID field
                     )
                     new_email.save()
 
@@ -306,6 +370,8 @@ class ListEmailsView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return HttpResponse("Emails fetched and stored successfully.")
+
+
     
 
 class PriorityEmailView(APIView):
@@ -538,12 +604,11 @@ class FetchEmails(APIView):
         token = user.Microsoft_credentials
         url = 'https://graph.microsoft.com/v1.0/me/messages?$top=300'
         headers = {'Authorization': 'Bearer ' + token}
-
+        print(token)
         try:
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             emails = response.json().get('value', [])
-
             for email in emails:
                 subject = email.get('subject', 'No Subject')
                 sender_name = email['sender']['emailAddress'].get('name', 'No Name')
@@ -696,3 +761,5 @@ class chat_with_AI(APIView):
             hours, minutes = map(int, time_estimate_str.split(':'))
             return timedelta(hours=hours, minutes=minutes)
         return timedelta() 
+
+

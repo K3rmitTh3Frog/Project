@@ -234,7 +234,8 @@ class CustomLoginView(APIView):
 class GmailAuthenticator(APIView):
     permission_classes = [IsAuthenticated]
     client_secrets_file = r'C:\321 project\Mybackend\myaccount\client_secrets.json'
-    scopes = ['https://www.googleapis.com/auth/gmail.readonly']
+    scopes = ['https://www.googleapis.com/auth/gmail.readonly','https://www.googleapis.com/auth/gmail.modify']
+
     redirect_uri = 'http://127.0.0.1:8000/accounts/callback/'
 
     def get_flow(self):
@@ -250,10 +251,11 @@ class GmailAuthenticator(APIView):
         request.session['state'] = state
         return redirect(authorization_url)
 
+
 class OAuth2CallbackView(APIView):
     permission_classes = [IsAuthenticated]
     client_secrets_file = r'C:\321 project\Mybackend\myaccount\client_secrets.json'
-    scopes = ['https://www.googleapis.com/auth/gmail.readonly']
+    scopes = ['https://www.googleapis.com/auth/gmail.readonly','https://www.googleapis.com/auth/gmail.modify']
     redirect_uri = 'http://127.0.0.1:8000/accounts/callback/'
 
     def get_flow(self):

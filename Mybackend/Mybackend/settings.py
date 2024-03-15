@@ -201,3 +201,6 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_REDIRECT_URL = '/accounts/profile/'
 
 LOGOUT_REDIRECT_URL = '/accounts/login'
+
+
+#CSRF_COOKIE_AGE = 3600

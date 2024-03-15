@@ -17,7 +17,8 @@ from django.db.models import Q
 from datetime import timedelta
 import re  # Regular expression library
 from datetime import datetime
-
+from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import ValidationError
 
 
 
@@ -27,7 +28,11 @@ class CalendarView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Event.objects.filter(UserID=user)
+        try:
+            queryset = Event.objects.filter(UserID=user)
+        except Event.DoesNotExist:
+            raise NotFound("No events found for this user.")
+        return queryset
     
 
 class CreateCalendarView(generics.CreateAPIView):
@@ -37,6 +42,12 @@ class CreateCalendarView(generics.CreateAPIView):
     def perform_create(self, serializer):
         user = self.request.user
         serializer.save(UserID=user)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except ValidationError as e:
+            return Response({"error": e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
 class SpecificEventView(generics.ListAPIView):
     serializer_class = CalendarSerializer
@@ -76,16 +87,13 @@ class ChangeTitleView(generics.GenericAPIView):
         try:
             event_item = Event.objects.get(pk=event_id, UserID=user)
         except Event.DoesNotExist:
-            return Response({"error": "event item not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Event item not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            event_item.Title = serializer.validated_data.get('new_Title')
-            event_item.save()
-            return Response({"success": "Title updated successfully"}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        serializer.is_valid(raise_exception=True)
+        event_item.Title = serializer.validated_data.get('new_Title')
+        event_item.save()
+        return Response({"success": "Title updated successfully"}, status=status.HTTP_200_OK)
         
 class ChangeEventDescriptionView(generics.GenericAPIView):
     serializer_class = ChangeEventDescriptionSerializer
@@ -107,6 +115,7 @@ class ChangeEventDescriptionView(generics.GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+#Done
 class ChangeStartDateView(generics.GenericAPIView):
     serializer_class = ChangeStartDateSerializer
     permission_classes = [IsAuthenticated]
@@ -116,17 +125,15 @@ class ChangeStartDateView(generics.GenericAPIView):
         try:
             event_item = Event.objects.get(pk=event_id, UserID=user)
         except Event.DoesNotExist:
-            return Response({"error": "event item not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Event item not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            event_item.StartDate = serializer.validated_data.get('new_start_date')
-            event_item.save()
-            return Response({"success": "Start date updated successfully"}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        event_item.StartDate = serializer.validated_data.get('new_start_date')
+        event_item.save()
+        return Response({"success": "Start date updated successfully"}, status=status.HTTP_200_OK)
 
-
+#Done
 class ChangeStartTimeView(generics.GenericAPIView):
     serializer_class = ChangeStartTimeSerializer
     permission_classes = [IsAuthenticated]
@@ -136,17 +143,16 @@ class ChangeStartTimeView(generics.GenericAPIView):
         try:
             event_item = Event.objects.get(pk=event_id, UserID=user)
         except Event.DoesNotExist:
-            return Response({"error": "event item not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Event item not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            event_item.StartTime = serializer.validated_data.get('new_start_time')
-            event_item.save()
-            return Response({"success": "Start time updated successfully"}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        event_item.StartTime = serializer.validated_data.get('new_start_time')
+        event_item.save()
+        return Response({"success": "Start time updated successfully"}, status=status.HTTP_200_OK)
 
 
+#Done
 class ChangeEndDateView(generics.GenericAPIView):
     serializer_class = ChangeEndDateSerializer
     permission_classes = [IsAuthenticated]
@@ -156,17 +162,16 @@ class ChangeEndDateView(generics.GenericAPIView):
         try:
             event_item = Event.objects.get(pk=event_id, UserID=user)
         except Event.DoesNotExist:
-            return Response({"error": "event item not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Event item not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            event_item.EndDate = serializer.validated_data.get('new_end_date')
-            event_item.save()
-            return Response({"success": "End date updated successfully"}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        event_item.EndDate = serializer.validated_data.get('new_end_date')
+        event_item.save()
+        return Response({"success": "End date updated successfully"}, status=status.HTTP_200_OK)
 
 
+#Done
 class ChangeEndTimeView(generics.GenericAPIView):
     serializer_class = ChangeEndTimeSerializer
     permission_classes = [IsAuthenticated]
@@ -176,15 +181,13 @@ class ChangeEndTimeView(generics.GenericAPIView):
         try:
             event_item = Event.objects.get(pk=event_id, UserID=user)
         except Event.DoesNotExist:
-            return Response({"error": "event item not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Event item not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            event_item.EndTime = serializer.validated_data.get('new_end_time')
-            event_item.save()
-            return Response({"success": "End time updated successfully"}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        event_item.EndTime = serializer.validated_data.get('new_end_time')
+        event_item.save()
+        return Response({"success": "End time updated successfully"}, status=status.HTTP_200_OK)
 
 
 
@@ -200,6 +203,9 @@ def directions_view(request):
     directions = get_directions(origin, destination, mode)
     return JsonResponse(directions)
 
+
+
+
 def duration_view(request):
     origin = request.GET.get('origin')
     destination = request.GET.get('destination')
@@ -209,42 +215,42 @@ def duration_view(request):
         return JsonResponse({"error": "Missing parameters"}, status=400)
 
     duration = get_duration(origin, destination, mode)
-    if "Error" in duration:
-        return JsonResponse({"error": duration}, status=500)
+    if duration.get("error"):
+        return JsonResponse({"error": duration["error"]}, status=500)
+
     return JsonResponse({"duration": duration})
 
 
 
+#need Hamza to test it
 
 class EventDurationCheckView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, event_id1, event_id2):
         try:
             event1 = Event.objects.get(pk=event_id1)
             event2 = Event.objects.get(pk=event_id2)
 
-            # Check if either event has a null destination
             if event1.Destination is None or event2.Destination is None:
                 return JsonResponse({"error": "One or both events have no destination"}, status=400)
 
             origin = event1.Destination
             destination = event2.Destination
-            mode = "driving"
+            mode = "driving" # make this custom to the user
 
-            # Create a new HttpRequest object for duration_view
             new_request = HttpRequest()
             new_request.GET = request.GET.copy()
             new_request.GET['origin'] = origin
             new_request.GET['destination'] = destination
             new_request.GET['mode'] = mode
 
-            # Call the duration_view function
             return duration_view(new_request)
 
         except Event.DoesNotExist:
             return JsonResponse({"error": "One or both events not found"}, status=404)
         
 
-
+#need Hamza to test it
 def duration_view(request):
     origin = request.GET.get('origin')
     destination = request.GET.get('destination')
@@ -260,6 +266,8 @@ def duration_view(request):
 
 
 
+#Hamzeh Needs to check
+
 def duration_view(request):
     origin = request.GET.get('origin')
     destination = request.GET.get('destination')
@@ -269,11 +277,14 @@ def duration_view(request):
         return JsonResponse({"error": "Missing parameters"}, status=400)
 
     duration = get_duration(origin, destination, mode)
-    if "Error" in duration:
+    if isinstance(duration, str) and "Error" in duration:
         return JsonResponse({"error": duration}, status=500)
+
     return JsonResponse({"duration": duration})
 
 #example:http://172.20.10.3:8081/calendar/duration/?origin=University+of+Wollongong+in+Dubai&destination=Dubai+Mall&mode=driving&
+
+#Hamzeh needs to check
 class CreateCalendarDurationCheckView(generics.CreateAPIView):
     serializer_class = CreateCalendatSerializer
     permission_classes = [IsAuthenticated]
@@ -324,27 +335,31 @@ class CreateCalendarDurationCheckView(generics.CreateAPIView):
 
 from django.utils import timezone
 
+#done
 class TodaysEventsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        current_date = timezone.localtime(timezone.now()).date()
-        current_time = timezone.localtime(timezone.now()).time()
-        
-        # Filter events for today
-        todays_events = Event.objects.filter(
-            UserID=user, 
-            StartDate=current_date
-        )
+        try:
+            user = request.user
+            current_date = timezone.localtime(timezone.now()).date()
+            current_time = timezone.localtime(timezone.now()).time()
+            
+            # Filter events for today
+            todays_events = Event.objects.filter(
+                UserID=user, 
+                StartDate=current_date
+            )
 
-        # Count events that have not started yet
-        future_events_count = todays_events.filter(StartTime__gt=current_time).count()
+            # Count events that have not started yet
+            future_events_count = todays_events.filter(StartTime__gt=current_time).count()
 
-        # Count events that have already started
-        past_events_count = todays_events.filter(StartTime__lte=current_time).count()
+            # Count events that have already started
+            past_events_count = todays_events.filter(StartTime__lte=current_time).count()
 
-        return Response({
-            "past_events_today": past_events_count,
-            "future_events_today": future_events_count
-        })
+            return Response({
+                "past_events_today": past_events_count,
+                "future_events_today": future_events_count
+            })
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
