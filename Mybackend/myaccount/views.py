@@ -312,6 +312,9 @@ def microsoft_auth(request):
     elif request.method == "GET" and 'code' in request.GET:
         # Exchange code for token
         code = request.GET['code']
+        print(request)
+        print(code)
+        print(request)
         token_url = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
         data = {
             'grant_type': 'authorization_code',
@@ -323,6 +326,7 @@ def microsoft_auth(request):
         }
         response = requests.post(token_url, data=data)
         response_data = response.json()
+        print(response_data)
         
         if 'access_token' in response_data:
             access_token = response_data['access_token']

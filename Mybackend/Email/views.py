@@ -680,7 +680,7 @@ class chat_with_AI(APIView):
         received_date = serializer.validated_data["recievedDate"]
         senderEmail = serializer.validated_data["senderEmail"]
         received_date_str = received_date.strftime('%Y-%m-%d') if received_date else ""
-        messages = 'Email ' + body + ' received date ' + received_date_str + ' sender email: '+senderEmail
+        messages = ['Email ' + body + ' received date ' + received_date_str + ' sender email: '+senderEmail]
         print(messages)
         if not messages:
             response_data = {"message": "Messages can't be empty!"}

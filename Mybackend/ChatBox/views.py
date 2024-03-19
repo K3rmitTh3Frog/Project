@@ -39,6 +39,6 @@ class UserChatHistoryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        chat_history = Chatbot.objects.filter(UserID=request.user).order_by('-Date')
+        chat_history = Chatbot.objects.filter(UserID=request.user).order_by('Date')
         serializer = ChatbotSerializer(chat_history, many=True)
         return Response(serializer.data)
