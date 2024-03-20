@@ -20,7 +20,7 @@ class ExternalServiceView(APIView):
                 return Response({"error": "User must be authenticated to send messages."}, status=status.HTTP_401_UNAUTHORIZED)
 
             try:
-                url = "http://localhost:8080/chat"
+                url = "http://52.63.121.96/api/chat"
                 headers = {'Content-Type': 'application/json'}
                 response = requests.post(url, json=message_data, headers=headers)
                 if response.status_code == 201:
