@@ -14,9 +14,10 @@ import { useNavigation, useRootNavigationState } from 'expo-router'
 import { useAppDispatch } from '../../store'
 import { setSessionId } from '../../store/reducers/MasterReducer'
 import { logoutUser } from '../../utils/routes'
-
+import { useRouter } from 'expo-router'
 
 const CustomDrawer = (props: DrawerContentComponentProps) => {
+    const router = useRouter()
     const currScreenIndex = props.state.index
 
     const dispatch = useAppDispatch()
@@ -24,8 +25,7 @@ const CustomDrawer = (props: DrawerContentComponentProps) => {
     const onLogout = async () => {
         const data = await logoutUser()
         dispatch(setSessionId(''))
-        props.navigation.getParent()?.dispatch({ type: 'POP_TO_TOP' })
-       
+        router.push('/onboarding')
     }
 
     return (
@@ -40,31 +40,38 @@ const CustomDrawer = (props: DrawerContentComponentProps) => {
                 style={styles.logo}
             />
             <View style={{ marginTop: hp(6) }}>
-                {props.state.routeNames.map((route, index) => {
-                    return (
-                        <React.Fragment key={route}>
-                            <TouchableOpacity
-                                style={[
-                                    styles.item,
-                                    currScreenIndex == index &&
-                                        styles.activeItem,
-                                ]}
-                                onPress={() => props.navigation.navigate(route)} //custom routing
-                            >
-                                <Text
+                {props.state.routeNames
+                    .filter((route) => route !== 'connectinbox/index')
+                    .filter((route) => route !== 'FAQ/index')
+                    //.filter((route) => route !== 'emailDetails/index')
+                    .filter((route) => route !== 'profileInfo/index')
+                    .map((route, index) => {
+                        return (
+                            <React.Fragment key={route}>
+                                <TouchableOpacity
                                     style={[
-                                        styles.label,
+                                        styles.item,
                                         currScreenIndex == index &&
-                                            styles.activeLabel,
+                                            styles.activeItem,
                                     ]}
+                                    onPress={() =>
+                                        props.navigation.navigate(route)
+                                    } // Custom routing
                                 >
-                                    {routes[route] ?? route}
-                                </Text>
-                            </TouchableOpacity>
-                            <View style={styles.line} />
-                        </React.Fragment>
-                    )
-                })}
+                                    <Text
+                                        style={[
+                                            styles.label,
+                                            currScreenIndex == index &&
+                                                styles.activeLabel,
+                                        ]}
+                                    >
+                                        {routes[route] ?? route}
+                                    </Text>
+                                </TouchableOpacity>
+                                <View style={styles.line} />
+                            </React.Fragment>
+                        )
+                    })}
             </View>
             <TouchableOpacity style={styles.button} onPress={onLogout}>
                 <Text style={styles.buttonText}>Logout</Text>

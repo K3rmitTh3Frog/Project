@@ -6,7 +6,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { colors } from '../../../constants'
 import CustomToggleButton from '../../../components/drawer/CustomToggleButton'
 import {
@@ -16,64 +16,62 @@ import {
 import { Image } from 'expo-image'
 import { FlashList } from '@shopify/flash-list'
 
-type Props = {}
+import { fetchChatBotMessages } from '../../../utils/routes';
+import { useAppSelector } from '../../../store';
 
-const index = (props: Props) => {
-    const [messages, setMessages] = useState([
-        {
-            message: "Hey there, Let's get you started!",
-            user_id: 1,
-        },
-        {
-            message: 'Could you check my calendar for Firday please?',
-            user_id: 2,
-        },
-        {
-            message:
-                "Of course! On Friday, January 26th, you have:\n10:00 - Doctor's appointment\n18:00 - Driving exam",
-            user_id: 1,
-        },
-        {
-            message: "Hey there, Let's get you started!",
-            user_id: 1,
-        },
-        {
-            message: 'Could you check my calendar for Firday please?',
-            user_id: 2,
-        },
-        {
-            message:
-                "Of course! On Friday, January 26th, you have:\n10:00 - Doctor's appointment\n18:00 - Driving exam",
-            user_id: 1,
-        },
-        {
-            message: "Hey there, Let's get you started!",
-            user_id: 1,
-        },
-        {
-            message: 'Could you check my calendar for Firday please?',
-            user_id: 2,
-        },
-        {
-            message:
-                "Of course! On Friday, January 26th, you have:\n10:00 - Doctor's appointment\n18:00 - Driving exam",
-            user_id: 1,
-        },
-    ])
+type Message = {
+    ChatID: number;
+    Date: string;
+    UserID: string;
+    isUser: boolean;
+    message: string;
+}
 
-    const [isLoaded, setLoaded] = useState(false)
+const index = () => {
+    const { sessionId } = useAppSelector((state) => state.saved.master);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [isLoaded, setLoaded] = useState(false);
+    const [currInput, setInput] = useState('');
 
-    const ref = useRef<FlashList<{ message: string; user_id: number }>>(null!)
+    useEffect(() => {
+        
+        const fetchMessages = async () => {
+            try {
+                const fetchedMessages = await fetchChatBotMessages(sessionId);
+                
+                // Update the messages state
+                setMessages(prevMessages => [...prevMessages, ...fetchedMessages]);
+                
+                
+                setLoaded(true); // Set loaded to true after updating messages
+            } catch (error) {
+                console.error('Error fetching chat messages:', error);
+            }
+        };
+        fetchMessages()
+    }, [sessionId]);
 
-    const [currInput, setInput] = useState('')
+
+    
 
     const onSubmit = () => {
-        setMessages((prev) => [...prev, { message: currInput, user_id: 2 }])
-        setInput('')
+        // Example: generating a new ChatID could be more complex depending on your application requirements
+        const newChatID = messages.length > 0 ? messages[messages.length - 1].ChatID + 1 : 1;
+        
+        const newMessage = {
+            ChatID: newChatID, // Assuming a simple increment for the example
+            UserID: "currentUserId", // This should be the current user's ID
+            message: currInput,
+            isUser: true, // Ensure this is a boolean
+            Date: new Date().toISOString(), // Format the current date as ISO string
+        };
+    
+        setMessages(prev => [...prev, newMessage]);
+        setInput('');
     }
 
     const scrollToBottom = () => {
-        ref.current.scrollToEnd({ animated: true })
+        // Do whatever you need to do to scroll to the bottom
     }
 
     return (
@@ -87,8 +85,7 @@ const index = (props: Props) => {
             </View>
             <View style={styles.containertwo}>
                 <FlashList
-                    ref={ref}
-                    data={messages}
+                    data={messages.map(msg => ({ ...msg, isUser: Boolean(msg.isUser) }))}
                     ItemSeparatorComponent={() => (
                         <View style={{ width: '100%', height: hp(3) }} />
                     )}
@@ -96,12 +93,11 @@ const index = (props: Props) => {
                     estimatedItemSize={hp(9)}
                     onContentSizeChange={scrollToBottom}
                     renderItem={({ item, index }) => {
-                        const { message, user_id } = item
+                        const { message, isUser } = item
                         return (
                             <View
                                 style={{
-                                    flexDirection:
-                                        user_id == 1 ? 'row' : 'row-reverse',
+                                    flexDirection: isUser === true ? 'row' : 'row-reverse',
                                     gap: wp(3),
                                     alignItems: 'center',
                                 }}
@@ -109,7 +105,7 @@ const index = (props: Props) => {
                             >
                                 <Image
                                     source={
-                                        user_id == 1
+                                        isUser == false
                                             ? require('../../../assets/logo.png')
                                             : require('../../../assets/avatar.svg')
                                     }

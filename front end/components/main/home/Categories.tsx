@@ -4,19 +4,20 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons  } from '@expo/vector-icons'
 import { colors } from '../../../constants'
 import * as Progress from 'react-native-progress'
-
+import { useRouter } from 'expo-router'
 interface CategoryProps {
     progress: number;
     label: string | React.ReactNode; // Allow React.ReactNode for label
-    iconName: "chatbox-sharp" | "mail" | "list-sharp" | "settings";
+    iconName: "calendar" | "mail" | "list-sharp" | "notifications";
     title: string;
     onPress: () => void; // Add onPress prop for touch event
 }
 
 const Category = ({ progress, label, iconName, title, onPress }: CategoryProps) => {
+    
     return (
         <TouchableOpacity onPress={onPress}>
             <View style={styles.box}>
@@ -49,10 +50,15 @@ type Props = {
     calendarProgress: number;
     toDoListProgress: number;
     mailInboxProgress: number;
-    onCategoryPress: (category: string) => void; // Add onCategoryPress prop
+
+    FutureEvents: number;
+    UnreadEmails: number;
+    RemainingTODoList: number;
+    
 };
 
-const Categories = ({ calendarProgress, toDoListProgress, mailInboxProgress, onCategoryPress }: Props) => {
+const Categories = ({ calendarProgress, toDoListProgress, mailInboxProgress,FutureEvents,UnreadEmails,RemainingTODoList }: Props) => {
+    const router = useRouter()
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Categories</Text>
@@ -66,31 +72,31 @@ const Categories = ({ calendarProgress, toDoListProgress, mailInboxProgress, onC
             >
                 <Category
                     progress={calendarProgress}
-                    label=""
-                    iconName="chatbox-sharp"
-                    title="Chatbot"
-                    onPress={() => onCategoryPress('Chatbot')}
+                    label={`${FutureEvents} Events remaining`}
+                    iconName="calendar"
+                    title="Calendar"
+                    onPress={() => router.push('/main/Calendar')}
                 />
                 <Category
                     progress={mailInboxProgress}
-                    label="3 new emails"
+                    label={`${UnreadEmails} new emails`}
                     iconName="mail"
                     title="Mailbox"
-                    onPress={() => onCategoryPress('Mailbox')}
+                    onPress={() => router.push('/main/email')}
                 />
                 <Category
                     progress={toDoListProgress}
-                    label="2 Tasks remaining"
+                    label={`${RemainingTODoList} Tasks remaining`}
                     iconName="list-sharp"
                     title="To-do List"
-                    onPress={() => onCategoryPress('To-do List')}
+                    onPress={() => router.push('main/to-do')}
                 />
                 <Category
                     progress={1}
-                    label=""
-                    iconName="settings"
-                    title="Settings"
-                    onPress={() => onCategoryPress('Settings')}
+                    label="3 Tasks generated"
+                    iconName="notifications"
+                    title="AI To-do List"
+                    onPress={() => router.push('main/Settings')}
                 />
             </View>
         </View>

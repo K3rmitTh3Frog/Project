@@ -1,22 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import {
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, TouchableWithoutFeedback } from 'react-native';
 import { Image } from 'expo-image';
 import { FlashList } from '@shopify/flash-list';
 import { fetchEmailsNoRefresh } from '../../../utils/routes';
 import { colors } from '../../../constants';
-import {
-    heightPercentageToDP as hp,
-    widthPercentageToDP as wp,
-} from 'react-native-responsive-screen';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { useAppSelector } from '../../../store';
+import { useNavigation } from '@react-navigation/native';
+import EmailDetailsScreen from '../../main/emailDetails/index';
+import { useRouter } from 'expo-router'; // Import useRouter if not already imported
+import { StackNavigationProp } from '@react-navigation/stack';
 
+// Define the type for the route parameters
+type RootStackParamList = {
+    EmailDetails: { EmailID: string };
+  // Add other screens if any
+};
+
+// Extract the navigation prop type from React Navigation stack
+type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EmailDetails'>;
 
 type Email = {
+    EmailID: string;
     Sender: string;
     Subject: string;
 };
@@ -24,6 +29,8 @@ type Email = {
 const Index = () => {
     const [emails, setEmails] = useState<Email[]>([]);
     const { sessionId } = useAppSelector((state) => state.saved.master);
+    const navigation = useNavigation<ProfileScreenNavigationProp>(); // Moved inside component body
+    const router = useRouter();
 
     useEffect(() => {
         const fetchEmailsData = async () => {
@@ -36,7 +43,11 @@ const Index = () => {
         };
 
         fetchEmailsData();
-    }, [sessionId]); // Add sessionId as a dependency
+    }, [sessionId]);
+
+    const handleEmailPress = (emailId: string) => { // Corrected function parameter
+        navigation.navigate('EmailDetails', { EmailID: emailId }); // Corrected usage
+    };
 
     return (
         <View style={styles.container}>
@@ -62,38 +73,40 @@ const Index = () => {
                         )}
                         estimatedItemSize={hp(9.2)}
                         renderItem={({ item, index }) => (
-                            <TouchableOpacity style={styles.item} key={index}>
-                                <View
-                                    style={{
-                                        flexDirection: 'row',
-                                        gap: wp(4.2),
-                                    }}
-                                >
-                                    <Image
-                                        source={require('../../../assets/uowd.svg')}
-                                        style={styles.itemImage}
-                                    />
-                                    <View>
-                                        <Text
-                                            style={styles.itemSender}
-                                            numberOfLines={1}
-                                        >{`from: ${item.Sender}`}</Text>
-                                        <Text
-                                            numberOfLines={1}
-                                            style={styles.itemSubject}
-                                        >{`subject: ${item.Subject}`}</Text>
+                            <TouchableWithoutFeedback onPress={() => handleEmailPress(item.EmailID)}>
+                                <View style={styles.item} key={index}>
+                                    <View
+                                        style={{
+                                            flexDirection: 'row',
+                                            gap: wp(4.2),
+                                        }}
+                                    >
+                                        <Image
+                                            source={require('../../../assets/uowd.svg')}
+                                            style={styles.itemImage}
+                                        />
+                                        <View>
+                                            <Text
+                                                style={styles.itemSender}
+                                                numberOfLines={1}
+                                            >{`from: ${item.Sender}`}</Text>
+                                            <Text
+                                                numberOfLines={1}
+                                                style={styles.itemSubject}
+                                            >{`subject: ${item.Subject}`}</Text>
+                                        </View>
+                                    </View>
+                                    <View style={styles.itemButton}>
+                                        <Image
+                                            source={require('../../../assets/chevron-right.svg')}
+                                            style={{
+                                                width: '100%',
+                                                height: '100%',
+                                            }}
+                                        />
                                     </View>
                                 </View>
-                                <View style={styles.itemButton}>
-                                    <Image
-                                        source={require('../../../assets/chevron-right.svg')}
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                        }}
-                                    />
-                                </View>
-                            </TouchableOpacity>
+                            </TouchableWithoutFeedback>
                         )}
                     />
                 </View>
@@ -109,7 +122,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'space-between',
         backgroundColor: colors.bg,
-        marginBottom: 0, 
+        marginBottom: 0,
     },
     title: {
         fontFamily: 'Poppins_700Bold',

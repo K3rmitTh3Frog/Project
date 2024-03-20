@@ -68,10 +68,9 @@ const SettingsScreen =(props: Props) =>{
         <SettingsOption title="Profile Information" iconName="person-circle" onPress={() => router.push('/main/profileInfo')} />
         <SettingsOption title="FAQ" iconName="help-circle" onPress={() => router.push('/main/FAQ')} />
         <SettingsOption title="Notifications" iconName="notifications" onPress={() => router.push('/main/notifications')} />
-        <SettingsOption title="Connect Your Inbox" iconName="link" onPress={() => router.push('/main/home')} />
+        <SettingsOption title="Connect Your Inbox" iconName="link" onPress={() => router.push('/main/ConnectInbox')} />
         <SettingsOption title="Priority Emails" iconName="alert-circle" />
       </ScrollView>
-
       {/* Bottom Tab Navigation */}
       <BottomNavBar />
     </View>

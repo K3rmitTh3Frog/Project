@@ -9,7 +9,7 @@ import {
 import TodayProgress from '../../../components/main/home/TodayProgress';
 import Categories from '../../../components/main/home/Categories';
 import { fetchUserData, StatisticsCalendar, StatisticsToDoList, StatisticsEmail } from '../../../utils/routes';
-import { useAppSelector } from '../../../store';
+import { useAppSelector } from '../../../store'; //import for sessionID
 
 type Props = {};
 
@@ -19,7 +19,6 @@ const Index = (props: Props) => {
     const [toDoListStats, setToDoListStats] = useState({ complete_count: 0, in_progress_count: 0, not_started_count: 0, total: 0 });
     const [emailStats, setEmailStats] = useState({ unopened_emails_today: 0, opened_emails_today: 0, total: 0 });
     const { sessionId } = useAppSelector((state) => state.saved.master);
-
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -75,16 +74,14 @@ const Index = (props: Props) => {
                     </Text>
                     <Text>{"!\nLet's get you started"}</Text>
                 </Text>
-
                 <TodayProgress totalProgress={totalProgress} />
-
                 <Categories
                     calendarProgress={calendarProgress}
                     toDoListProgress={toDoListProgress}
                     mailInboxProgress={mailInboxProgress}
-                    onCategoryPress={(category) => {
-                        console.log("Category pressed:", category);
-                    }}
+                    FutureEvents={calendarStats.future_events_today} 
+                    UnreadEmails={emailStats.unopened_emails_today} 
+                    RemainingTODoList={totalToDoTasks-toDoListStats.complete_count}
                 />
             </View>
             <BottomNavBar />

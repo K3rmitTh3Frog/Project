@@ -216,10 +216,9 @@ export const logoutUser = async () => {
 };
 
 
-export const changeEmail = async (newEmail: string) => {
+export const changeEmail = async (newEmail: string,sessionId:string) => {
     try {
 
-        const { sessionId } = useAppSelector((state) => state.saved.master)
         const response = await backendAxios.post(`accounts/change-email/`, { new_Email: newEmail }, {
             headers: {
                 'Content-Type': 'application/json',
@@ -238,11 +237,53 @@ export const changeEmail = async (newEmail: string) => {
     }
 };
 
-export const changePassword = async (current_password: string, new_password: string) => {
+
+
+export const changeProfession = async (newProfession: string, sessionId: string) => {
+  console.log(newProfession)
+  try {
+      const response = await backendAxios.post(`accounts/change-profession/`, { new_Profession: newProfession }, {
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionId}`,
+          },
+      });
+
+      if (response.status === 200) {
+          return { success: true, message: response.data.success };
+      } else {
+          return { success: false, message: response.data.error || 'An error occurred' };
+      }
+  } catch (error) {
+      console.error('Change profession error', error);
+      return { success: false, message: 'An error occurred while changing the profession' };
+  }
+};
+
+export const changePhone = async (newPhone: string, sessionId: string) => {
+  console.log(newPhone)
+  try {
+      const response = await backendAxios.post(`accounts/change-phone/`, { new_Phone: newPhone }, {
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionId}`,
+          },
+      });
+
+      if (response.status === 200) {
+          return { success: true, message: response.data.success };
+      } else {
+          return { success: false, message: response.data.error || 'An error occurred' };
+      }
+  } catch (error) {
+      console.error('Change phone error', error);
+      return { success: false, message: 'An error occurred while changing the phone number' };
+  }
+};
+
+
+export const changePassword = async (current_password: string, new_password: string,sessionId:string) => {
     try {
-  
-    const { sessionId } = useAppSelector((state) => state.saved.master)
-  
       const response = await backendAxios.post(`accounts/change-password/`, { current_password, new_password }, {
         headers: {
           'Content-Type': 'application/json',
@@ -314,10 +355,9 @@ export const fetchEmailsNoRefresh = async (sessionId:string) => {
     }
 };
 
-
-export const fetchPriorityEmails = async () => {
+//done
+export const fetchPriorityEmails = async (sessionId:string) => {
     try {
-    const { sessionId } = useAppSelector((state) => state.saved.master)
   
       const response = await backendAxios.get(`email/view-priority-emails/`, {
         headers: {
@@ -336,9 +376,8 @@ export const fetchPriorityEmails = async () => {
     }
   };
 
-  export const addPriorityEmail = async (emailAddress:string) => {
+  export const addPriorityEmail = async (emailAddress:string,sessionId:string) => {
     try {
-        const { sessionId } = useAppSelector((state) => state.saved.master)
 
   
       const response = await backendAxios.post(
@@ -363,10 +402,9 @@ export const fetchPriorityEmails = async () => {
     }
   };
 
-
-  export const deletePriorityEmail = async (priorityId:string) => {
+//done
+  export const deletePriorityEmail = async (priorityId:number,sessionId:string) => {
     try {
-        const { sessionId } = useAppSelector((state) => state.saved.master)
 
   
       const response = await backendAxios.delete(`email/delete-priority-email/${priorityId}/`, {
@@ -391,9 +429,8 @@ export const fetchPriorityEmails = async () => {
     }
   };
 
-  export const deleteEmail = async (emailId:string) => {
+  export const deleteEmail = async (emailId:string,sessionId:string) => {
     try {
-        const { sessionId } = useAppSelector((state) => state.saved.master)
   
       const response = await backendAxios.delete(`email/delete/${emailId}/`, {
         headers: {
@@ -444,21 +481,17 @@ export const fetchPriorityEmails = async () => {
     }
   };
 
-  export const fetchUniqueEmails = async (email_id:string) => {
+  export const fetchUniqueEmails = async (email_id:number,sessionId:string) => {
     try {
-      // Fetch CSRF token first
-      const { sessionId } = useAppSelector((state) => state.saved.master)
-  
       const response = await backendAxios.get(`email/${email_id}/`, {
         headers: {
-          'Authorization': `Bearer ${sessionId}`, // Add authentication token
+          'Authorization': `Bearer ${sessionId}`, 
         },
       });
   
       if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
       return response.data;
     } catch (error) {
       console.error('Error fetching email data:', error);
@@ -560,11 +593,8 @@ export async function fetchEvents(sessionId:string) {
       return { success: false, message: 'An error occurred while deleting the Event' };
     }
   }
-
   export const createEvent = async (newEventData:string,session_id:string) => {
     try {
-
-  
       const response = await backendAxios.post(`calendar/create/`, newEventData, {
         headers: {
           'Content-Type': 'application/json',
@@ -582,11 +612,7 @@ export async function fetchEvents(sessionId:string) {
       return { success: false, message: 'An error occurred during the creation of the event' };
     }
   }
-
-
 //done
-
-
 export async function StatisticsCalendar(session_id:string) {
     try {
 
@@ -634,8 +660,6 @@ export async function StatisticsToDoList(session_id:string) {
 
   export async function fetchTodoLists(session_id:string) {
     try {
-
-      
       const response = await backendAxios.get(`todolist/viewall/`, {
         headers: {
           'Authorization': `Bearer ${session_id}`,
@@ -652,3 +676,25 @@ export async function StatisticsToDoList(session_id:string) {
       throw error;
     }
   }
+
+
+
+//////////////////////////chatbot
+
+export async function fetchChatBotMessages(session_id:string) {
+  try {
+    const response = await backendAxios.get(`chatBot/chat/history/`, {
+      headers: {
+        'Authorization': `Bearer ${session_id}`,
+      },
+    });
+
+    if (response.status !== 200) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching to-do lists:', error);
+    throw error;
+  }
+}

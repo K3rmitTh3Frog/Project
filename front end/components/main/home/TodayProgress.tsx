@@ -23,6 +23,8 @@ const TodayProgress = ({ totalProgress }: Props) => { // Destructure totalProgre
                 }}
             >
                 <Text style={styles.title}>{"Today's progress"}</Text>
+                {/*
+                
                 <Progress.Circle
                     progress={totalProgress} 
                     color="white"
@@ -33,6 +35,7 @@ const TodayProgress = ({ totalProgress }: Props) => { // Destructure totalProgre
                         transform: [{ rotate: '90deg' }],
                     }}
                 />
+                */}
             </View>
             <Progress.Bar
                 progress={totalProgress} // Use totalProgress here as well

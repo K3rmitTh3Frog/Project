@@ -1,27 +1,91 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, SafeAreaView, ScrollView, StatusBar } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, ScrollView, StatusBar, TouchableOpacity, TextInput } from 'react-native';
 import { Feather as Icon } from '@expo/vector-icons';
 import BottomNavBar from '../../../components/layout/BottomNavBar';
-import { fetchUserData } from '../../../utils/routes';
+import { fetchUserData, changeEmail, changeProfession, changePhone } from '../../../utils/routes'; // Modified imports
 import { useAppSelector } from '../../../store';
 
 const ProfileScreen = () => {
-    const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState<Record<string, boolean>>({});
+  const [editValues, setEditValues] = useState<Record<string, string>>({});
   const { sessionId } = useAppSelector((state) => state.saved.master);
+
   useEffect(() => {
-    
     const fetchUser = async () => {
       try {
-        const data = await fetchUserData(sessionId); 
+        const data = await fetchUserData(sessionId);
         setUserData(data);
+        setEditValues({
+          name: data.name,
+          username: data.username,
+          email: data.email,
+          phone: data.phone,
+          profession: data.profession,
+        });
       } catch (error) {
         console.error('Error fetching user data:', error);
-        // Handle error
       }
     };
 
     fetchUser();
   }, []);
+
+  const handleEdit = (field: string) => {
+    setIsEditing({ ...isEditing, [field]: true });
+  };
+
+  const handleSave = async (field: string) => {
+    try {
+      let updatedData;
+      switch (field) {
+        case 'email':
+          updatedData = await changeEmail(editValues[field],sessionId);
+          break;
+        case 'profession':
+          updatedData = await changeProfession(editValues[field],sessionId);
+          break;
+        case 'phone':
+          updatedData = await changePhone(editValues[field],sessionId);
+          break;
+        default:
+          console.error('Invalid field:', field);
+          return;
+      }
+      
+      setUserData({ ...userData, [field]: editValues[field] });
+      setIsEditing({ ...isEditing, [field]: false });
+    } catch (error) {
+      console.error(`Error updating ${field}:`, error);
+    }
+  };
+
+  const handleChange = (field: string, value: string) => {
+    setEditValues({ ...editValues, [field]: value });
+  };
+
+  const renderField = (field: string, icon: string) => (
+    <View style={styles.fieldContainer} key={field}>
+      <Icon name={icon} size={24} color="#FFFFFF" style={styles.fieldIcon} />
+      {isEditing[field] ? (
+        <TextInput
+          value={editValues[field]}
+          onChangeText={(value) => handleChange(field, value)}
+          style={styles.fieldInput}
+          autoFocus
+        />
+      ) : (
+        <TouchableOpacity style={{ flex: 1 }} onPress={() => handleEdit(field)}>
+          <Text style={styles.fieldText}>{userData[field]}</Text>
+        </TouchableOpacity>
+      )}
+      {isEditing[field] && (
+        <TouchableOpacity onPress={() => handleSave(field)}>
+          <Icon name="check" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -32,26 +96,11 @@ const ProfileScreen = () => {
         </View>
         {userData && (
           <>
-            <View style={styles.fieldContainer}>
-              <Icon name="user" size={24} color="#FFFFFF" style={styles.fieldIcon} />
-              <Text style={styles.fieldText}>{userData.name}</Text>
-            </View>
-            <View style={styles.fieldContainer}>
-              <Icon name="user" size={24} color="#FFFFFF" style={styles.fieldIcon} />
-              <Text style={styles.fieldText}>{userData.username}</Text>
-            </View>
-            <View style={styles.fieldContainer}>
-              <Icon name="mail" size={24} color="#FFFFFF" style={styles.fieldIcon} />
-              <Text style={styles.fieldText}>{userData.email}</Text>
-            </View>
-            <View style={styles.fieldContainer}>
-              <Icon name="phone" size={24} color="#FFFFFF" style={styles.fieldIcon} />
-              <Text style={styles.fieldText}>{userData.phone}</Text>
-            </View>
-            <View style={styles.fieldContainer}>
-              <Icon name="briefcase" size={24} color="#FFFFFF" style={styles.fieldIcon} />
-              <Text style={styles.fieldText}>{userData.profession}</Text>
-            </View>
+            {renderField('name', 'user')}
+            {renderField('username', 'user')}
+            {renderField('email', 'mail')}
+            {renderField('phone', 'phone')}
+            {renderField('profession', 'briefcase')}
           </>
         )}
       </ScrollView>
@@ -92,8 +141,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 25,
     lineHeight: 70,
-    fontWeight: 'bold', // Add bold style here
-    textAlign: 'center', // Center align the text
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   footer: {
     position: 'absolute',
@@ -111,6 +160,12 @@ const styles = StyleSheet.create({
   },
   footerButton: {
     // styles for footer buttons
+  },
+  fieldInput: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    flex: 1,
+    marginRight: 10,
   },
 });
 

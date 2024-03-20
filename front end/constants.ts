@@ -18,4 +18,5 @@ export const routes: { [key: string]: string } = {
     'Settings/index': 'Settings',
     'profileInfo/index': 'Profile Information',
     'notifications/index': 'Notifications',
+    'emailDetails/index': 'EmailDetails',
 }

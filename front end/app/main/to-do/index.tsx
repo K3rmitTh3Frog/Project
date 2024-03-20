@@ -174,7 +174,6 @@ const index = (props: Props) => {
                         )
                     })}
                 </View>
-
                 {isGranted ? (
                     <List currDate={selectedDate} />
                 ) : (

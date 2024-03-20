@@ -1,0 +1,3 @@
+npm install
+npm install -g expo-cli
+npx expo start --dev-client

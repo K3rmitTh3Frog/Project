@@ -79,9 +79,9 @@ React.useEffect(() => {
         body: `grant_type=authorization_code&code=${code}&redirect_uri=${authRe.redirectUri}&client_id=${authRe.clientId}&scope=${authRe.scopes}`,
       });
 
+      console.log(tokenResponse)
       const json = await tokenResponse.json();
-      await AsyncStorage.setItem('access_token', json.accessToken)
-      console.log(json.access_token)
+      //await AsyncStorage.setItem('access_token', json.accessToken)
       setToken(json.access_token);
       
     };
