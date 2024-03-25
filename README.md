@@ -1,7 +1,9 @@
-# Project README
-
+# username and a password to login to our application
 - **username**: hamzehhirzalla
 - **password**: jumanlovescheese
+
+# backend server
+http://3.93.164.156/
 ## User Account Functions
 
 - **Login**: Users can log in to their accounts.
