@@ -1,5 +1,7 @@
 # Project README
 
+- **username**: hamzehhirzalla
+- **password**: jumanlovescheese
 ## User Account Functions
 
 - **Login**: Users can log in to their accounts.
