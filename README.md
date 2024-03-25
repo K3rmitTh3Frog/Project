@@ -1,4 +1,4 @@
-# Mybackend Project README
+# Project README
 
 ## User Account Functions
 
@@ -11,8 +11,8 @@
 - **Change Profession**: Users can update their profession details.
 - **Confirm Email**: Verify the email address registered through OTP (One-Time Password).
 - **Login using other platforms**: Facilitates logging in via different platforms.
-- **Forgot Password**: Implement password reset functionality.
-- **Forgot Password**: Implement password reset functionality.
+- **Forgot Password**: password reset functionality.
+- **Forgot Password**: password reset functionality.
 
 ## To-do List Features
 
@@ -29,28 +29,14 @@
 - **Delete an Event**: Remove events.
 - **Update a Field**: Change event details (e.g., title).
 - **View Event**: See event details.
-- **Assistant**: Add assistant functionality.
+- **Assistant**: assistant functionality.
 
 ## email Functionality
 
-- **Read the Inbox (IMAP)**: Implement inbox reading via gmial API.
+- **Read the Inbox**: Implement inbox reading via Gmail API.
 - **Set Priority Emails**: Allow setting priority for emails based on a provided list.
 
-## Remaining Functions To Implement
 
-### Account
-
-- **OTP When Signed In**: Implement OTP verification during sign-in.
-
-### Calendar
-
-### Emails
-
-- **Send an Email (IMAP)**: Enable sending emails through IMAP.
-
-### Database
-
-- **Integrate Viewing Security**: Enhance security through an integrated view.
 
 ## Steps to Run the Backend
 
@@ -76,6 +62,18 @@
   `python manage.py migrate`
 - Start the server:  
   `python manage.py runserver`
+## Mistral 7B model and Gemini chatbot
+- A virtiual enviromnt must be created for the model
+- Install the dependencies from the reqiuremets.txt files provided in each folder
+- Mistral 7B model needs LM studio to run:
+- step 1: download LM studio
+- step 2: go the file icon on the left and upload the model
+- step 3  go to local server and start the server
+- step 4: use `python app.py runserver` to start the server 
+  Disclaimer for Mistral7B model:
+  Since its an LLm it might take time to generate a to-do list because of your system. The system specfications that were used to run the model smoothly were: Processor	13th Gen Intel(R) Core(TM) i7-13650HX, 2600 Mhz, 14 Core(s), 20 Logical Processor(s) and NVIDIA GeForce RTX 4060 Laptop GPU, NVIDIA compatible 
+
+
 
 
 ---
