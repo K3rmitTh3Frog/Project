@@ -77,6 +77,11 @@
 - Start the server:  
   `python manage.py runserver`
 
+  Disclaimer for Mistral7B model:
+  Since its an LLm it might take time to generate a to-do list because of your system. The system specfications that were used to run the model smoothly were: Processor	13th Gen Intel(R) Core(TM) i7-13650HX, 2600 Mhz, 14 Core(s), 20 Logical Processor(s) and NVIDIA GeForce RTX 4060 Laptop GPU, NVIDIA compatible 
+
+
+
 
 ---
 
