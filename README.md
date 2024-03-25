@@ -70,9 +70,16 @@
 - step 2: go the file icon on the left and upload the model
 - step 3  go to local server and start the server
 - step 4: use `python app.py runserver` to start the server 
-  Disclaimer for Mistral7B model:
+- Disclaimer for Mistral7B model:
   Since its an LLm it might take time to generate a to-do list because of your system. The system specfications that were used to run the model smoothly were: Processor	13th Gen Intel(R) Core(TM) i7-13650HX, 2600 Mhz, 14 Core(s), 20 Logical Processor(s) and NVIDIA GeForce RTX 4060 Laptop GPU, NVIDIA compatible 
 
+
+## How to run the FRONT END code
+- download this apk build 1stly : https://expo.dev//accounts/vladiusftw/projects/jumantestpatience/builds/4b82cd45-eb49-4fb3-a7a7-1065a37a9ca1
+- then after that open the code on vs code
+- run : npm i to install all dependencies
+- then run : npx expo start --dev-client
+- then check the front end code integrated on the apk
 
 
 
