@@ -11,8 +11,8 @@
 - **Change Profession**: Users can update their profession details.
 - **Confirm Email**: Verify the email address registered through OTP (One-Time Password).
 - **Login using other platforms**: Facilitates logging in via different platforms.
-- **Forgot Password**: Implement password reset functionality.
-- **Forgot Password**: Implement password reset functionality.
+- **Forgot Password**: password reset functionality.
+- **Forgot Password**: password reset functionality.
 
 ## To-do List Features
 
@@ -29,28 +29,14 @@
 - **Delete an Event**: Remove events.
 - **Update a Field**: Change event details (e.g., title).
 - **View Event**: See event details.
-- **Assistant**: Add assistant functionality.
+- **Assistant**: assistant functionality.
 
 ## email Functionality
 
-- **Read the Inbox (IMAP)**: Implement inbox reading via gmial API.
+- **Read the Inbox**: Implement inbox reading via Gmail API.
 - **Set Priority Emails**: Allow setting priority for emails based on a provided list.
 
-## Remaining Functions To Implement
 
-### Account
-
-- **OTP When Signed In**: Implement OTP verification during sign-in.
-
-### Calendar
-
-### Emails
-
-- **Send an Email (IMAP)**: Enable sending emails through IMAP.
-
-### Database
-
-- **Integrate Viewing Security**: Enhance security through an integrated view.
 
 ## Steps to Run the Backend
 
